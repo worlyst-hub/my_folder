@@ -19,26 +19,50 @@ for test_case in range(1, T + 1):                     # 10번 반복이기 때�
         puzzle.append(raw_data)                       # 불러온 raw_data를 빈리스트인 puzzle에 추가
 
 
+    result = 1
+
 # 가로열 검증
     for row in puzzle:                                # 퍼즐에 있는 스도쿠 한 게임을 가로열을 기준으로 하나씩 호출
         row_nums = []                                 # 가로열에 있는 숫자를 하나씩 넣을 빈 리스트 생성
         for num in row:                               # 가로열에 있는 숫자 9개를 하나씩 호출
-            row.append(num)
-            if num in row_nums:                       # if문을 활용해 row_nums에 num이 있다면 False 출력
-                is_valid = False
+            if num in row_nums:                       # if문을 활용해 row_nums에 num이 있다면 1 출력, 없다면 0 출력
+                result = 0
+                break
+            else:
+                row_nums.append(num)
+
 
 
 # 세로열 검증
-    for i in range(9):                                # 인덱스를 활용할 0부터 8까지 9개의 숫자를 하나씩 호출
-        col_nums = []                                 # 세로열에 있는 숫자를 모을 빈 리스트 생성
-        for column in puzzle[i]:                      # 스도쿠 한 게임을 세로열을 기준으로 숫자들을 하나씩 호출
-            col_nums.append(column)                   # 호출한 숫자들을 col_nums에 추가
-            if column in col_nums:                    # if 문을 활용해 col_nums에 column 숫자들이 있다면 False 출력
-                is_valid = False
+    if result == 1:
+        for c in range(9):                              # 인덱스를 활용할 0부터 8까지 9개의 숫자를 하나씩 호출
+            col_nums = []                               # 세로열에 있는 숫자를 모을 빈 리스트 생성
+            for r in range(9):
+                column_num = puzzle[r][c]
+                if column_num in col_nums:
+                    result = 0
+                    break
+                else:
+                    col_nums.append(column_num)
+
 
 
 # 3x3 범위 검증
+    if result == 1:
+        for r in range(0, 9, 3):
+            for c in range(0, 9, 3):
+                box_nums = []
+                for i in range(3):
+                    for j in range(3):
+                        num = puzzle[r + i][c + j]
+                        if num in box_nums:
+                            result = 0
+                            break
+                        else:
+                            box_nums.append(num)
 
+
+    print(f"#{test_case} {result}")
 
 
 
