@@ -1,51 +1,104 @@
-📌 문제 정보
-플랫폼: SW Expert Academy (SWEA)
-문제 번호/이름: 1204번 - 최빈수 구하기
-난이도: D2
+## 💡 깃허브 이슈(Issue) 작성 가이드 & 템플릿
+
+깃허브 이슈 게시판은 혼자 공부한 기록을 남기거나, 팀 프로젝트에서 문제 해결 과정을 공유하는 아주 좋은 공간입니다. 코딩 테스트(SWEA) 풀이와 어려웠던 점을 기록할 때는 "무엇을 풀었고, 어떤 에러를 만났으며, 어떻게 해결했는가"가 한눈에 보이도록 작성하는 것이 좋습니다.
+
+---
+
+### 📋 추천하는 이슈 작성 형식 (마크다운 템플릿)
+
+이슈를 생성할 때 아래의 형식을 복사해서 내용만 채워 넣으시면 깔끔하게 정리됩니다.
 
 
-💻 제출 코드
+## 📌 문제 정보
+- **플랫폼:** SW Expert Academy (SWEA)
+- **문제 번호/이름:** 1974번 - 스도쿠 검증
+- **난이도:** D2
+
+---
+
+## 💻 제출 코드
+```python
+# 10개의 스도쿠 게임 만듬
 T = int(input())
 for test_case in range(1, T + 1):
-    num = int(input())
-    scores = list(map(int, input().split()))
+    puzzle = []
+    for i in range(9):
+        raw_data = list(map(int, input().split()))
+        puzzle.append(raw_data)
 
-    score_counts = {}
-    for score in scores:
-        if score in score_counts:
-            score_counts[score] += 1
-        else:
-            score_counts[score] = 1
+    result = 1
 
-    max_score_1 = 0
-    max_score_2 = 0
-
-    for score, count in score_counts.items():
-        if count > max_score_1:
-            max_score_1 = count
-            max_score_2 = score
-        elif count == max_score_1:
-            if score > max_score_2:
-                max_score_2 = score
-
-    print(f"#{num} {max_score_2}")
+# 가로열 검증
+    for row in puzzle:
+        row_nums = []
+        for num in row:
+            if num in row_nums:
+                result = 0
+                break
+            else:
+                row_nums.append(num)
 
 
-🔥 어려웠던 점 & 트러블 슈팅 (Troubleshooting)
-문제 상황 / 고민:
-알고리즘을 푸는 것이 처음이다 보니 모든게 낯설었음. 문제 구상은 파이썬 월간평가 공부했던 것이 많은 도움이 되었지만 아직 익숙하지 않아 많은 공부가 필요함을 느낌.
-또한 오타로 인해 결과가 출력이 안돼 당황했음.
+# 세로열 검증
+    if result == 1:
+        for c in range(9):
+            col_nums = []
+            for r in range(9):
+                column_num = puzzle[r][c]
+                if column_num in col_nums:
+                    result = 0
+                    break
+                else:
+                    col_nums.append(column_num)
 
-원인 분석:
-데이터를 불러오고 활용하는 방법을 몰라 처음에 시간을 허비함.
-자동완성을 이용해야했지만 일일이 치는 버릇때문에 오타가 발생함.
 
-해결 방법:
-데이터를 불러오는 방법은 혜강이의 도움으로 해결함.
-데이터를 활용할 수 있도록 바꾸는 코드인 "scores = list(map(int, input().split()))"은 AI의 도움을 받음.
+# 3x3 범위 검증
+    if result == 1:
+        for r in range(0, 9, 3):
+            for c in range(0, 9, 3):
+                box_nums = []
+                for i in range(3):
+                    for j in range(3):
+                        num = puzzle[r + i][c + j]
+                        if num in box_nums:
+                            result = 0
+                            break
+                        else:
+                            box_nums.append(num)
 
-💡 배운 점 / 느낀 점
-파이썬 월간평가 공부했던 것 덕분에 빈도수를 구하는 알고리즘은 시간은 오래 걸렸지만 결국 해냈음. 다만, 아직 알고리즘 푸는 것이 익숙하지 않아 많은 공부가 필요함을 느낌.
+
+    print(f"#{test_case} {result}")
+
+```
+
+---
+
+## 🔥 어려웠던 점 & 트러블 슈팅 (Troubleshooting)
+
+1. **문제 상황 / 고민:**
+* 문제 구상은 했지만, 문제 풀이과정에서 3x3범위를 어떻게 검증해야하는지 생각을 못함.
+* 결과 출력 단계에서 검증 성공 시 1, 실패 시 0을 출력하는 부분에서 방향을 잡지 못함.
+
+
+2. **원인 분석:**
+* 반복문으로 범위 지정을 하는 법을 몰랐음.
+* if 문으로 처음 시도했지만 결과가 잘나오지 못해 AI 도움을 받음.
+
+
+3. **해결 방법:**
+* AI도움으로 문제를 풀었고 강사님이 설명해주셔서 이해할 수 있었음.
+* AI의 도움으로 기존 result 값에 1을 할당하고 검증 실패 시 0을 재할당하는 방법으로 해결.
+
+
+
+---
+
+## 💡 배운 점 / 느낀 점
+
+* 중첩 행렬에 대해 처음 배웠고 아직 익숙하지 않지만 원리를 이해함
+* 
+
+```
 
 ---
 
