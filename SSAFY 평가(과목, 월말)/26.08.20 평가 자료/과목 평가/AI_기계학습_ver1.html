@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & 머신러닝 실전 모의고사 (1~34번 전체)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { font-family: 'Pretendard', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold">✏️ AI & 머신러닝 실전 문제 풀이</h1>
+                <p class="text-indigo-200 text-xs mt-0.5">총 34문항 | 직접 답을 체크하고 제출해보세요!</p>
+            </div>
+            <div id="score-badge" class="hidden bg-white text-indigo-700 px-4 py-2 rounded-xl font-bold text-lg shadow">
+                점수: <span id="user-score">0</span> / 34
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Form -->
+    <main class="max-w-5xl mx-auto px-4 py-8 flex-1 w-full">
+        <form id="quiz-form" onsubmit="submitQuiz(event)" class="space-y-6">
+            <div id="quiz-container" class="space-y-6">
+                <!-- JavaScript로 34문제 전체 동적 생성 -->
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-6 text-center">
+                <button type="submit" class="w-full md:w-2/3 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-xl shadow-lg transition transform active:scale-95">
+                    🚀 답안 제출하고 채점하기
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        const quizData = [
+            // PART 1 (1~19)
+            { num: 1, title: "AI, ML, DL의 관계에 대한 설명으로 옳은 것은?", options: ["ML은 AI와 DL의 상위 개념이다.", "AI는 반드시 ML을 사용해야 한다.", "ML은 AI의 한 부분으로, 데이터로부터 학습을 수행한다.", "규칙 기반 시스템은 ML의 한 분야이다.", "ML은 사람이 직접 코딩한 규칙을 그대로 사용하는 방식이다."], ans: 3, exp: "ML(머신러닝)은 AI(인공지능)의 한 분야로, 데이터로부터 규칙을 학습합니다." },
+            { num: 2, title: "Feature와 Label에 대한 설명으로 옳지 않은 것은?", options: ["Feature는 모델이 예측에 사용하는 입력 정보이다.", "Label은 모델이 예측하려는 정답, 즉 학습의 목표이다.", "Feature와 Label의 분포와 관계가 학습 결과를 결정한다.", "Feature는 반드시 수치형 데이터만 될 수 있다.", "Label은 분류 문제에서는 카테고리, 회귀 문제에서는 수치값이 될 수 있다."], ans: 4, exp: "Feature는 수치형뿐만 아니라 범주형, 텍스트, 이미지 등 다양한 형태가 가능합니다." },
+            { num: 3, title: "미지의 참 함수 f(X)를 학습하는 이유로 적절하지 않은 것은?", options: ["Feature(X)와 Label(Y) 사이의 관계를 알기 위해", "모든 데이터의 측정오차(오차항)를 제거하기 위해", "새로운 입력 X에 대해 목표값 Y를 예측하기 위해", "여러 Feature(X) 중 Label(Y)과 관계를 갖고 있는 Feature를 알기 위해", "Feature(X) 값의 변화에 따라서 Label(Y)이 어떻게 변화하는지 알기 위해"], ans: 2, exp: "학습을 아무리 잘하더라도 내재된 자연 측정 오차까지 완전히 제거할 수는 없습니다." },
+            { num: 4, title: "지도학습(Supervised Learning)에 대한 설명으로 옳은 것은?", options: ["입력 데이터만 있고 정답(라벨)이 없는 데이터로 학습한다.", "새로운 입력에 대해 정답을 잘 맞추는 함수를 학습한다.", "오버피팅은 훈련 데이터에서의 오류를 최대한 줄이는 것으로 학습이 목표하는 방향이다.", "지도학습 모델의 출력은 반드시 범주(카테고리)이다.", "지도학습은 측정오차를 최소화하는 것이 목적이다."], ans: 2, exp: "지도학습은 입력 데이터와 정답(라벨)을 함께 주고 새로운 입력의 정답을 맞추는 규칙을 찾습니다." },
+            { num: 5, title: "회귀(Regression) 문제의 특징으로 옳은 것은?", options: ["스팸/정상 분류와 같은 범주 예측 문제를 다룬다.", "예측값은 연속적인 숫자(예: 가격, 점수, 온도)로 나온다.", "대표적인 성능 지표는 정확도(Accuracy)이다.", "예측 결과는 이산적인 값으로 한정된다.", "훈련 데이터와 테스트 데이터의 분포가 다르면 반드시 발생한다."], ans: 2, exp: "회귀 문제는 집값, 온도, 매출액처럼 연속된 숫자를 예측하는 문제입니다." },
+            { num: 6, title: "혼동행렬에 대한 설명으로 옳지 않은 것은?", options: ["TP (True Positive): 실제 양성을 양성으로 예측한 경우", "TN (True Negative): 실제 음성을 음성으로 예측한 경우", "FP (False Positive): 실제 음성인데 양성으로 잘못 예측한 경우", "FN (False Negative): 실제 양성인데 음성으로 잘못 예측한 경우", "혼동행렬은 회귀 문제의 성능 평가에서 사용된다."], ans: 5, exp: "혼동행렬은 분류 문제의 평가 지표입니다. 회귀 평가에는 MSE, R제곱 등이 쓰입니다." },
+            { num: 7, title: "훈련 오류와 테스트 오류에 대한 설명으로 옳은 것은?", options: ["훈련 오류는 새로운 데이터에 대한 예측 정확도를 측정한다.", "테스트 오류는 학습에 사용된 데이터에 대해 계산한 평균 오차이다.", "궁극적으로 테스트 오류를 최소화하는 것이 학습의 목적이다.", "일반적으로 훈련 오류는 테스트 오류보다 크게 나타난다.", "훈련 오류는 항상 0에 수렴해야 좋은 모델이다."], ans: 3, exp: "머신러닝의 궁극적인 목적은 보지 못한 새로운 데이터(테스트 오류)를 잘 맞추는 것입니다." },
+            { num: 8, title: "언더피팅과 오버피팅의 특징을 올바르게 설명한 것은?", options: ["언더피팅은 훈련 오류와 테스트 오류 모두 크게 나타난다.", "언더피팅은 모델이 지나치게 복잡해 데이터 잡음까지 학습하는 현상이다.", "오버피팅은 모델이 단순해 중요한 패턴을 놓치는 현상이다.", "오버피팅은 훈련 오류가 크고 테스트 오류가 작게 나타난다.", "두 경우 모두 모델 복잡도를 높이면 해결된다."], ans: 1, exp: "언더피팅은 모델이 너무 단순하여 훈련과 테스트 오차가 모두 높게 나옵니다." },
+            { num: 9, title: "K-겹 교차검증(K-fold CV)에 대한 설명으로 옳지 않은 것은?", options: ["데이터를 K개 그룹(폴드)으로 나누어, 각 그룹을 한 번씩 검증셋으로 사용한다.", "K번 반복한 후 각 폴드별 평균 오차를 계산해 일반화 성능을 추정한다.", "K가 전체 데이터 개수(n)와 같을 경우 LOOCV라고 부른다.", "교차검증은 데이터 활용성을 높이면서 테스트 오류에 대한 추정이 가능하다.", "교차검증 시, 각 폴드에 속한 데이터가 겹쳐도 무방하다."], ans: 5, exp: "교차검증 시 폴드 간 데이터가 서로 겹치지 않도록 명확하게 분리해야 합니다." },
+            { num: 10, title: "다음 중 비지도 학습(Unsupervised Learning)의 예로 해당하는 것은?", options: ["스팸 메일 분류", "집값 변화 예측", "(라벨이 없는 데이터에서) 구매 성향별 고객 묶음 찾기", "주간 날씨 예측"], ans: 3, exp: "정답(라벨) 없이 비슷한 특성의 데이터를 묶는 군집화(클러스터링)는 대표적인 비지도 학습입니다." },
+            { num: 11, title: "K-means와 계층적 군집의 특징 설명 중 올바른 것은?", options: ["K-means는 덴드로그램 구조를 생성한다.", "계층적 군집은 K값을 미리 지정해 학습한다.", "K-means는 클러스터 내부 변동 합을 최소화하는 방식이다.", "계층적 군집은 대용량 데이터처리에 가장 빠른 알고리즘이다."], ans: 3, exp: "K-means는 군집 중심과 데이터 간 거리 변동 합을 최소화하는 대표적 군집화 기법입니다." },
+            { num: 12, title: "AI, ML, DL의 포함 관계 설명으로 옳은 것을 고르시오.", options: ["DL ⊂ AI ⊂ ML", "AI ⊂ ML ⊂ DL", "ML ⊂ DL ⊂ AI", "DL ⊂ ML ⊂ AI"], ans: 4, exp: "딥러닝(DL)은 머신러닝(ML)에 포함되고, 머신러닝은 인공지능(AI)에 포함됩니다." },
+            { num: 13, title: "다음 중 Feature와 Label에 대한 설명으로 옳지 않은 것은?", options: ["Feature는 입력 설명 변수이다.", "Label은 예측 대상(정답)이다.", "Feature는 오직 수치형만 가능하다.", "Feature와 Label의 관계가 성능에 영향을 준다."], ans: 3, exp: "Feature는 수치형 외에 범주형, 텍스트, 이미지 등 다양한 형태를 가집니다." },
+            { num: 14, title: "다음 중 분류 문제의 예로 옳은 것은?", options: ["월매출 예측", "온도 예측", "집값 예측", "이메일 스팸/정상 판별"], ans: 4, exp: "스팸/정상 판별은 범주를 맞추는 분류 문제이고, 나머지는 수치를 맞추는 회귀 문제입니다." },
+            { num: 15, title: "오버피팅과 분포 변화(Data Shift)의 개념으로 옳은 설명은?", options: ["오버피팅은 훈련·테스트 분포가 달라서만 발생한다.", "분포 변화로 오류가 늘 수 있으나, 이는 오버피팅과 별개의 개념이다.", "분포 변화가 없으면 오버피팅은 불가능하다.", "오버피팅은 테스트 성능이 높을 때 나타난다."], ans: 2, exp: "분포 변화(Data Shift)와 훈련 데이터를 오버암기하는 오버피팅은 서로 다른 독립적인 현상입니다." },
+            { num: 16, title: "K-fold 교차검증의 주된 목적은?", options: ["훈련 오차 최소화", "테스트 데이터 누출 방지", "일반화 성능 추정의 분산을 줄이며 편향을 완화", "파라미터 수를 줄여 모델 단순화"], ans: 3, exp: "데이터를 여러 번 나누어 검증함으로써 평가 결과의 편향과 분산을 줄여 안정적인 성능을 추정합니다." },
+            { num: 17, title: "다음 중 혼동행렬에 대한 설명으로 틀린 것을 고르시오.", options: ["True Positive (TP): 실제 양성 · 예측 양성", "True Negative (TN): 실제 음성 · 예측 음성", "False Positive (FP): 실제 양성인데 음성으로 예측", "False Negative (FN): 실제 양성인데 음성으로 예측"], ans: 3, exp: "FP(False Positive)는 실제 '음성'인데 '양성'으로 잘못 예측한 가짜 양성(오보)입니다." },
+            { num: 18, title: "이진 분류에서 정밀도(Precision)를 나타낸 수식으로 올바른 것은?", options: ["TP / (TP + FP)", "TP / (TP + FN)", "FP / (TP + FP)", "FN / (TP + FN)"], ans: 1, exp: "정밀도(Precision)는 모델이 양성이라고 예측한 전체(TP + FP) 중 실제 양성(TP)의 비율입니다." },
+            { num: 19, title: "다음 중 회귀 문제로 가장 적절한 것은?", options: ["이메일 스팸/정상 예측", "종양 양성/악성 예측", "아파트 매매가 예측", "고객 이탈 여부 분류"], ans: 3, exp: "아파트 매매가는 연속형 숫자를 예측하므로 회귀 문제입니다." },
+
+            // PART 2 (20~34)
+            { num: 20, title: "단순선형회귀에서 오차를 최소화하기 위해 사용하는 기본적인 기법은?", options: ["최소제곱법 (Ordinary Least Squares)", "크로스 엔트로피", "경사하강법만 가능", "원-핫 인코딩"], ans: 1, exp: "단순선형회귀에서는 잔차제곱합(RSS)을 최소화하는 최소제곱법을 주로 사용합니다." },
+            { num: 21, title: "입력 변수들끼리 강한 상관관계를 가져 계수 추정이 불안정해지는 현상은?", options: ["과적합", "다중공선성 (Multicollinearity)", "편향-분산 트레이드오프", "기울기 소실"], ans: 2, exp: "설명변수들 간 상관계수가 매우 높은 현상을 다중공선성이라고 합니다." },
+            { num: 22, title: "선형회귀 및 범주형 변수에 대한 설명 중 틀린 것은?", options: ["다중범주 문제에는 선형회귀보다 로지스틱 회귀가 적절하다.", "선형회귀 예측값은 0 미만이나 1 초과가 나올 수 있다.", "날씨(맑음, 눈, 비)처럼 순서 없는 범주는 1, 2, 3으로 변환하는 것이 최선이다.", "범주형 변수는 원-핫 인코딩 등을 활용한다."], ans: 3, exp: "순서가 없는 카테고리를 단순 숫자 1, 2, 3으로 바꾸면 인위적인 순서가 생기므로 원-핫 인코딩을 써야 합니다." },
+            { num: 23, title: "로지스틱 함수(시그모이드)의 출력 범위로 옳은 것은?", options: ["0 이상 1 이하 [0, 1]", "0 초과 1 미만 (0, 1)", "음의 무한대 ~ 양의 무한대", "0 또는 1 exact"], ans: 2, exp: "로지스틱 함수는 어떤 숫자가 들어가도 0 초과 1 미만의 구간 (0, 1) 사이 값으로 출력됩니다." },
+            { num: 24, title: "로지스틱 회귀 학습에 주로 사용되는 손실함수는?", options: ["평균제곱오차 (MSE)", "교차 엔트로피 손실 (Cross-Entropy Loss)", "절대오차 (MAE)", "R제곱 지표"], ans: 2, exp: "로지스틱 회귀는 확률 예측 모델이므로 교차 엔트로피(Cross-Entropy) 손실을 사용합니다." },
+            { num: 25, title: "경사하강법에서 파라미터를 업데이트하는 이동 방향은?", options: ["기울기(Gradient)의 방향", "기울기(Gradient)의 반대 방향", "항상 가중치를 증가시키는 방향", "무작위 랜덤 방향"], ans: 2, exp: "손실을 줄이기 위해 기울기(경사)가 낮아지는 반대 방향(- gradient)으로 이동합니다." },
+            { num: 26, title: "활성화 함수 중 깊은 신경망에서 기울기 소실 문제를 완화하기 위해 가장 널리 쓰이는 함수는?", options: ["Sigmoid", "Tanh", "ReLU", "Step Function"], ans: 3, exp: "ReLU는 양수 영역에서 미분값이 1로 유지되어 기울기 소실 문제를 크게 줄여줍니다." },
+            { num: 27, title: "훈련 중에 무작위로 일부 뉴런을 끄고 학습하여 과적합을 방지하는 정규화 기법은?", options: ["배치 정규화 (Batch Normalization)", "드롭아웃 (Dropout)", "학습률 스케줄링", "조기 종료 (Early Stopping)"], ans: 2, exp: "무작위로 뉴런을 끄는 기법은 드롭아웃(Dropout)입니다." },
+            { num: 28, title: "다음 중 RSS(잔차제곱합)의 정의로 올바른 것은?", options: ["예측값들의 평균", "관측 오차의 단순 합", "각 데이터의 (실제값 - 예측값) 제곱의 합", "표본 분산의 크기"], ans: 3, exp: "RSS(Residual Sum of Squares)는 관측값과 예측값의 차이인 잔차를 제곱해서 모두 더한 값입니다." },
+            { num: 29, title: "결정계수 R제곱에 대한 설명 중 옳은 것은?", options: ["0보다 작아질 수 없다.", "평균으로 예측하는 모델보다 성능이 떨어지면 음수(0 미만)가 될 수 있다.", "항상 1보다 크다.", "값이 클수록 항상 과적합이다."], ans: 2, exp: "R제곱은 모델의 예측력이 그냥 평균으로 맞추는 것보다도 못할 경우 0보다 작은 음수가 될 수 있습니다." },
+            { num: 30, title: "상관관계와 다중공선성에 대한 설명 중 옳지 않은 것은?", options: ["상관관계가 높다고 해서 반드시 인과관계인 것은 아니다.", "다중공선성이 심하면 계수의 표준오차가 커진다.", "다중공선성이 발생해도 p-value는 항상 정밀해진다.", "변수 선택이나 규제를 통해 다중공선성을 완화할 수 있다."], ans: 3, exp: "다중공선성이 심하면 추정치의 분산이 커져 p-value가 불안정해지고 신뢰성을 잃습니다." },
+            { num: 31, title: "딥러닝 신경망 구조에서 층(Depth)을 깊게 쌓을 때 발생하는 단점으로 올바른 것은?", options: ["파라미터 개수가 무조건 0이 된다.", "학습 중 기울기 소실/폭발 현상이 발생하기 쉽다.", "과적합 위험이 완전히 사라진다.", "연산 속도가 비약적으로 빨라진다."], ans: 2, exp: "층이 깊어지면 역전파 과정에서 기울기가 사라지거나 폭발하는 최적화 난관에 부딪히기 쉽습니다." },
+            { num: 32, title: "확률적 경사하강법(SGD)의 특징으로 옳지 않은 것은?", options: ["미니배치를 사용해 1스텝당 연산량이 작다.", "임의의 노이즈가 있어 국소 최솟값(Local Minima)을 탈출하는 데 유리하다.", "매끄러운 데이터에서 항상 Full-batch GD보다 안정되게 수렴한다.", "대규모 데이터 학습 시 메모리 효율적이다."], ans: 3, exp: "노이즈가 없는 아주 매끄러운 문제에서는 전체 데이터를 다 쓰는 Full-batch GD가 더 안정적입니다." },
+            { num: 33, title: "이진 분류 문제에서 선형회귀 대신 로지스틱 회귀를 쓰는 가장 큰 이유는?", options: ["계산 속도가 무조건 빨라서", "출력값이 0과 1 사이로 제한되어 확률로 해석하기 용이해서", "범주 개수가 많아서", "p-value를 구하지 않기 위해서"], ans: 2, exp: "선형회귀는 음수나 1을 넘는 무한대 값이 나올 수 있지만, 로지스틱 회귀는 (0, 1) 사이 확률 값으로 변환됩니다." },
+            { num: 34, title: "다음 중 손실함수(Loss Function)의 유일한 핵심 역할은?", options: ["입력 데이터를 무작위로 섞기", "현재 모델의 예측이 얼마나 잘못되었는지 오차 측정하기", "파라미터 가중치를 직접 수정하기", "학습률(Learning Rate) 자동 설정하기"], ans: 2, exp: "손실함수는 오직 '현재 모델이 정답과 얼마나 떨어져 있는지(오차)'를 수치화하여 측정해 주는 역할입니다." }
+        ];
+
+        // Render Questions
+        const container = document.getElementById('quiz-container');
+        quizData.forEach((q, idx) => {
+            const card = document.createElement('div');
+            card.className = "bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4";
+            
+            let optionsHtml = q.options.map((opt, oIdx) => `
+                <label class="flex items-start gap-3 p-3 bg-slate-50 hover:bg-indigo-50/50 rounded-xl border border-slate-200 cursor-pointer transition">
+                    <input type="radio" name="q${q.num}" value="${oIdx + 1}" class="mt-1 text-indigo-600 focus:ring-indigo-500">
+                    <span class="text-sm font-medium text-slate-700">${oIdx + 1}. ${opt}</span>
+                </label>
+            `).join('');
+
+            card.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-md">문제 ${q.num}</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base">${q.title}</h3>
+                <div class="space-y-2">${optionsHtml}</div>
+                
+                <!-- Feedback Area -->
+                <div id="feedback-q${q.num}" class="hidden pt-3 border-t border-slate-100 space-y-1">
+                    <div id="status-q${q.num}" class="text-xs font-bold"></div>
+                    <div class="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                        💡 <strong>해설:</strong> ${q.exp}
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        // Submit and Grade
+        function submitQuiz(e) {
+            e.preventDefault();
+            let score = 0;
+
+            quizData.forEach(q => {
+                const selected = document.querySelector(`input[name="q${q.num}"]:checked`);
+                const feedbackEl = document.getElementById(`feedback-q${q.num}`);
+                const statusEl = document.getElementById(`status-q${q.num}`);
+
+                feedbackEl.classList.remove('hidden');
+
+                if (selected && parseInt(selected.value) === q.ans) {
+                    score++;
+                    statusEl.className = "text-xs font-bold text-emerald-600";
+                    statusEl.innerText = "⭕ 정답입니다!";
+                } else {
+                    statusEl.className = "text-xs font-bold text-rose-600";
+                    const userVal = selected ? `${selected.value}번` : "미응답";
+                    statusEl.innerText = `❌ 오답입니다. (선택: ${userVal} / 정답: ${q.ans}번)`;
+                }
+            });
+
+            // Show Score
+            const scoreBadge = document.getElementById('score-badge');
+            document.getElementById('user-score').innerText = score;
+            scoreBadge.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

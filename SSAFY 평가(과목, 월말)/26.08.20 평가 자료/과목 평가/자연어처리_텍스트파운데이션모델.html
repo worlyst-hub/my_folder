@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자연어 처리 &amp; 텍스트파운데이션모델</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success-color: #10b981;
+            --success-bg: #ecfdf5;
+            --error-color: #ef4444;
+            --error-bg: #fef2f2;
+            --warning-color: #f59e0b;
+            --warning-bg: #fffbebf;
+            --border-color: #e2e8f0;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Screen Switcher */
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        /* Start Screen */
+        .start-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 40px 24px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .mode-selection {
+            display: flex;
+            gap: 20px;
+            margin-top: 32px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+            background: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .mode-btn h3 {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mode-btn p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Status & Progress Bar */
+        .progress-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .progress-bar-bg {
+            background: #e2e8f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar-fill {
+            background: var(--primary-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-tracker {
+            display: flex;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .status-tracker span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Question Navigation Grid */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+            gap: 8px;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background: #f8fafc;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            border-color: var(--primary-color);
+        }
+
+        .nav-item.current {
+            border-color: var(--primary-color);
+            font-weight: 800;
+            outline: 2px solid var(--primary-color);
+        }
+
+        .nav-item.unanswered { background: #f8fafc; color: var(--text-secondary); }
+        .nav-item.correct { background: var(--success-color); color: #fff; border-color: var(--success-color); }
+        .nav-item.incorrect { background: var(--error-color); color: #fff; border-color: var(--error-color); }
+        .nav-item.revealed { background: var(--warning-color); color: #fff; border-color: var(--warning-color); }
+
+        /* Main Question Card */
+        .question-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .question-number {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            background: #eff6ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            white-space: pre-line;
+        }
+
+        /* Options */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .option-card {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fff;
+            position: relative;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary-color);
+            background: #f8fafc;
+        }
+
+        .option-card.selected {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .option-card input[type="radio"] {
+            margin-right: 14px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .option-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .option-badge {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-left: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .option-card.correct-opt {
+            border-color: var(--success-color);
+            background: var(--success-bg);
+        }
+        .option-card.correct-opt .option-badge {
+            color: var(--success-color);
+        }
+
+        .option-card.incorrect-opt {
+            border-color: var(--error-color);
+            background: var(--error-bg);
+        }
+        .option-card.incorrect-opt .option-badge {
+            color: var(--error-color);
+        }
+
+        /* Controls */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary { background: var(--primary-color); color: #fff; }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .btn-secondary { background: #f1f5f9; color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        .btn-warning { background: var(--warning-color); color: #fff; }
+        .btn-warning:hover { filter: brightness(0.9); }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Feedback Area */
+        .feedback-area {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            display: none;
+        }
+
+        .feedback-area.active {
+            display: block;
+        }
+
+        .feedback-area.correct-fb {
+            background: var(--success-bg);
+            border: 1px solid var(--success-color);
+            color: #065f46;
+        }
+
+        .feedback-area.incorrect-fb {
+            background: var(--error-bg);
+            border: 1px solid var(--error-color);
+            color: #991b1b;
+        }
+
+        .feedback-area.revealed-fb {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-color);
+            color: #92400e;
+        }
+
+        .feedback-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        /* Explanation Details */
+        .explanation-card {
+            margin-top: 20px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: none;
+        }
+
+        .explanation-card.active {
+            display: block;
+        }
+
+        .exp-section {
+            margin-bottom: 16px;
+        }
+
+        .exp-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .exp-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .exp-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            white-space: pre-line;
+        }
+
+        /* Navigation Controls */
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        /* Result Screen */
+        .result-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 40px 28px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #eff6ff;
+            border: 6px solid var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px auto;
+        }
+
+        .score-val {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .score-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .result-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 24px 0;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-item h4 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+        }
+
+        .stat-item p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Responsive Mobile Adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 12px 8px;
+            }
+            .question-card {
+                padding: 18px;
+            }
+            .mode-selection {
+                flex-direction: column;
+            }
+            .nav-grid {
+                grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+                gap: 6px;
+                padding: 10px;
+            }
+            .nav-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .nav-controls .btn {
+                width: 100%;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>자연어 처리 &amp; 텍스트 파운데이션 모델</h1>
+        <p>고내강 최고</p>
+    </header>
+
+    <!-- 1. START SCREEN -->
+    <div id="start-screen" class="screen active">
+        <div class="start-card">
+            <h2>학습 모드를 선택하세요</h2>
+            <p style="margin-top: 8px; color: var(--text-secondary);">강의자료 핵심 문제 (총 34문항) 기반 맞춤 풀이</p>
+
+            <div class="mode-selection">
+                <button class="mode-btn" onclick="startApp('study')">
+                    <h3>📚 학습 모드</h3>
+                    <p>개념을 하나씩 확인하며 학습합니다.<br>즉시 채점, 정답 확인, 상세 해설을 자유롭게 이용할 수 있습니다.</p>
+                </button>
+                <button class="mode-btn" onclick="startApp('exam')">
+                    <h3>📝 시험 모드</h3>
+                    <p>실제 시험처럼 풀이합니다.<br>정답과 해설은 숨겨지며, 모든 문제를 푼 뒤 최종 성적표를 확인합니다.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. QUIZ SCREEN -->
+    <div id="quiz-screen" class="screen">
+        <!-- Progress Bar & Status -->
+        <div class="progress-card">
+            <div class="progress-header">
+                <span id="progress-text">문제 1 / 34</span>
+                <span id="progress-percent">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="progress-fill" class="progress-bar-fill"></div>
+            </div>
+            <div class="status-tracker">
+                <span>🟢 정답: <strong id="count-correct">0</strong></span>
+                <span>🔴 오답: <strong id="count-incorrect">0</strong></span>
+                <span>🟡 확인: <strong id="count-revealed">0</strong></span>
+                <span>⚪ 미풀이: <strong id="count-unanswered">34</strong></span>
+            </div>
+        </div>
+
+        <!-- Question Navigation Grid -->
+        <div id="nav-grid" class="nav-grid"></div>
+
+        <!-- Question Main Card -->
+        <div class="question-card">
+            <div class="question-header">
+                <span id="q-number" class="question-number">문제 01</span>
+                <span id="mode-badge" style="font-size:0.85rem; color:var(--text-secondary); font-weight:600;">학습 모드</span>
+            </div>
+
+            <div id="q-text" class="question-text"></div>
+
+            <div id="options-container" class="options-list"></div>
+
+            <div class="action-buttons">
+                <button id="btn-submit" class="btn btn-primary" onclick="submitAnswer()">제출하기</button>
+                <button id="btn-show-ans" class="btn btn-warning" onclick="revealAnswer()">정답 보기</button>
+                <button id="btn-show-exp" class="btn btn-secondary" onclick="toggleExplanation()">해설 보기</button>
+            </div>
+
+            <!-- Feedback Box -->
+            <div id="feedback-area" class="feedback-area"></div>
+
+            <!-- Detailed Explanation Box -->
+            <div id="explanation-card" class="explanation-card">
+                <div class="exp-section">
+                    <div class="exp-label">[정답]</div>
+                    <div id="exp-correct" class="exp-content"></div>
+                </div>
+                <div class="exp-section">
+                    <div class="exp-label">[핵심 개념]</div>
+                    <div id="exp-concept" class="exp-content"></div>
+                </div>
+                <div class="exp-section">
+                    <div class="exp-label">[풀이]</div>
+                    <div id="exp-detail" class="exp-content"></div>
+                </div>
+                <div class="exp-section">
+                    <div class="exp-label">[왜 이 답인가?]</div>
+                    <div id="exp-why" class="exp-content"></div>
+                </div>
+                <div class="exp-section">
+                    <div class="exp-label">[시험 포인트]</div>
+                    <div id="exp-point" class="exp-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="nav-controls">
+            <button id="btn-prev" class="btn btn-secondary" onclick="prevQuestion()">← 이전 문제</button>
+            <button id="btn-finish-exam" class="btn btn-warning" style="display:none;" onclick="finishQuiz()">시험 종료 및 제출</button>
+            <button id="btn-next" class="btn btn-secondary" onclick="nextQuestion()">다음 문제 →</button>
+        </div>
+    </div>
+
+    <!-- 3. RESULT SCREEN -->
+    <div id="result-screen" class="screen">
+        <div class="result-card">
+            <h2>🎉 시험 및 학습 완료!</h2>
+            <p style="color: var(--text-secondary); margin-top: 6px;">수고하셨습니다. 결과 분석 및 복습을 진행하세요.</p>
+
+            <div style="margin-top: 24px;">
+                <div class="score-circle">
+                    <span id="final-score" class="score-val">0점</span>
+                    <span id="final-rate" class="score-label">정답률 0%</span>
+                </div>
+            </div>
+
+            <div class="result-stats">
+                <div class="stat-item">
+                    <h4 id="res-total">34</h4>
+                    <p>총 문제 수</p>
+                </div>
+                <div class="stat-item">
+                    <h4 id="res-correct" style="color: var(--success-color);">0</h4>
+                    <p>정답</p>
+                </div>
+                <div class="stat-item">
+                    <h4 id="res-incorrect" style="color: var(--error-color);">0</h4>
+                    <p>오답</p>
+                </div>
+                <div class="stat-item">
+                    <h4 id="res-revealed" style="color: var(--warning-color);">0</h4>
+                    <p>정답 확인</p>
+                </div>
+                <div class="stat-item">
+                    <h4 id="res-unanswered" style="color: var(--text-secondary);">0</h4>
+                    <p>미풀이</p>
+                </div>
+            </div>
+
+            <div class="result-actions">
+                <button class="btn btn-primary" onclick="restartQuiz('all')">🔄 처음부터 다시 풀기</button>
+                <button id="btn-retry-wrong" class="btn btn-secondary" onclick="restartQuiz('incorrect')">❌ 틀린 문제 다시 풀기</button>
+                <button class="btn btn-secondary" onclick="switchMode('study')">📖 전체 문제 복습 (학습 모드)</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==========================================
+// 1. DATA DEFINITIONS (34 Complete Questions)
+// Pure Text Formulas, No $ symbols.
+// ==========================================
+const questions = [
+    {
+        id: 1,
+        question: "One-hot Representation(원-핫 인코딩)에 대한 설명으로 옳지 않은 것을 고르시오.",
+        options: [
+            "1. 차원이 매우 커져 계산량이 증가한다.",
+            "2. 단어 간의 유사도는 항상 1이 나온다.",
+            "3. 대부분의 값이 0으로 채워져 메모리 효율이 낮다.",
+            "4. \"Dog\" - \"Puppy\"의 거리와 \"Dog\" - \"Computer\"의 거리는 같다."
+        ],
+        answer: 1, // Index 1 -> Option 2
+        concept: "원-핫 인코딩(One-hot Encoding)과 희소 벡터(Sparse Vector)의 직교성",
+        detail: "원-핫 인코딩은 단어 집합의 크기만큼 차원을 가지며 한 원소만 1이고 나머지는 0인 벡터 표현법입니다.",
+        why: "원-핫 인코딩에서는 서로 다른 두 단어 벡터가 항상 서로 직교(Orthogonal)하므로 내적(Dot Product) 값이 항상 0이 됩니다. 따라서 단어 간의 유사도는 항상 0이 되며 의미적 유사성을 반영하지 못합니다.",
+        examPoint: "원-핫 벡터 간 내적 = 0, 유사도 = 0, 의미적 유사성 표현 불가, 차원의 저주 발생."
+    },
+    {
+        id: 2,
+        question: "CBOW와 Skip-gram의 차이점에 대한 설명으로 옳은 것을 고르시오.",
+        options: [
+            "1. CBOW는 Skip-gram보다 적게 등장하는 단어에 대해 더 높은 정확도를 보인다.",
+            "2. CBOW는 Skip-gram보다 학습이 빠르고, 빈도가 높은 단어에서 성능이 좋다.",
+            "3. Skip-gram은 학습 속도는 빠르지만 드물게 등장하는 단어에 약하다.",
+            "4. Skip-gram은 한번에 여러 단어를 예측한다."
+        ],
+        answer: 1, // Index 1 -> Option 2
+        concept: "Word2Vec 모델 구조: CBOW vs Skip-gram",
+        detail: "CBOW는 주변 단어들(Context)로부터 중심 단어(Target)를 예측하고, Skip-gram은 중심 단어(Target)로부터 주변 단어들(Context)을 예측합니다.",
+        why: "CBOW는 주변 단어들의 합/평균으로 계산되어 학습 속도가 빠르고 빈출 단어에 강한 반면, Skip-gram은 드물게 등장하는 희귀 단어(Rare words) 표현 학습에 강합니다.",
+        examPoint: "CBOW = 주변->중심 (학습 빠름, 빈출 단어 강함). Skip-gram = 중심->주변 (학습 느림, 희귀 단어 강함)."
+    },
+    {
+        id: 3,
+        question: "워드 임베딩과 원-핫 인코딩의 가장 큰 차이점으로 가장 올바른 설명은 무엇인가?",
+        options: [
+            "1. 원-핫 인코딩은 단어 수만큼의 차원을 갖는 희소 벡터이고, 워드 임베딩은 저차원의 밀집 벡터이다.",
+            "2. 원-핫 인코딩은 단어 간 의미 유사성을 잘 반영하지만, 워드 임베딩은 반영하지 못한다.",
+            "3. 워드 임베딩은 항상 단어 개수와 동일한 차원을 가진다.",
+            "4. 원-핫 인코딩은 반드시 학습을 통해서만 생성되지만, 워드 임베딩은 학습이 필요 없다."
+        ],
+        answer: 0, // Option 1
+        concept: "희소 벡터(Sparse Vector) vs 밀집 벡터(Dense Vector)",
+        detail: "원-핫 인코딩은 어휘 사전 크기만큼의 고차원 희소 벡터이고, 워드 임베딩은 100~300차원 등 상대적으로 저차원의 밀집 실수 벡터입니다.",
+        why: "워드 임베딩은 학습을 통해 연속적인 벡터 공간 상에 단어를 표현하여 의미적 유사도를 거리 및 방향으로 나타낼 수 있습니다.",
+        examPoint: "원-핫 인코딩 = 고차원, 희소, 의미 미반영. 워드 임베딩 = 저차원, 밀집, 의미 유사성 반영."
+    },
+    {
+        id: 4,
+        question: "RNN이 기존 신경망(FNN, CNN)과 가장 크게 다른 점은 무엇인가?",
+        options: [
+            "1. RNN은 은닉층이 전혀 존재하지 않고, 입력층과 출력층만으로 구성된다.",
+            "2. RNN은 입력 데이터를 항상 고정된 길이의 벡터로만 처리할 수 있다.",
+            "3. RNN은 이미지를 인식하기 위해 컨볼루션 필터를 사용한다.",
+            "4. RNN은 순환 구조를 가지고 있어 시퀀스(Sequence) 데이터의 시간적 의존성을 학습할 수 있다."
+        ],
+        answer: 3, // Option 4
+        concept: "순환 신경망(RNN)의 순환 구조(Recurrence)와 은닉 상태(Hidden State)",
+        detail: "RNN은 이전 시점의 정보(hidden state)를 다음 시점으로 전달하는 순환 구조를 통해 순차적(Sequential) 데이터의 시계열적 의존성을 반영합니다.",
+        why: "전방 전달 신경망(FNN)은 시간적 순서를 고려하지 못하지만, RNN은 이전 단계의 은닉 상태를 입력으로 재활용하여 가변 길이 시퀀스를 처리할 수 있습니다.",
+        examPoint: "RNN의 핵심 = 가변 길이 입력 처리 가능, 시간적/순차적 의존성 학습, 은닉 상태(Hidden state) 유지."
+    },
+    {
+        id: 5,
+        question: "다음 말뭉치 정보가 주어졌을 때, 4-gram 언어모델에 따라 'The SSAFY students learn ____' 문장의 빈칸에 들어갈 단어 중 확률이 가장 높은 것은?\n[말뭉치 정보]\n- count(SSAFY students learn) = 900회\n- count(SSAFY students learn algorithm) = 270회\n- count(SSAFY students learn AI) = 450회\n- count(SSAFY students learn python) = 180회",
+        options: [
+            "1. algorithm",
+            "2. AI",
+            "3. python",
+            "4. database"
+        ],
+        answer: 1, // Option 2 (AI)
+        concept: "N-gram 언어 모델의 조건부 확률 계산",
+        detail: "N-gram 언어 모델은 직전 (N-1)개 단어를 조건으로 하여 다음 단어가 등장할 조건부 확률을 계산합니다. 4-gram의 경우 직전 3개 단어인 'SSAFY students learn'을 조건으로 봅니다.",
+        why: "P(AI | SSAFY students learn) = 450 / 900 = 0.5 (50%)로 다른 선택지들(algorithm: 30%, python: 20%)보다 확률이 가장 높습니다.",
+        examPoint: "N-gram 확률 = 조건부 확률 P(w_n | w_n-N+1, ..., w_n-1) = 해당 N-gram 빈도 / 직전 (N-1)-gram 빈도."
+    },
+    {
+        id: 6,
+        question: "Seq2Seq(Sequence-to-Sequence) 모델의 구조와 작동 방식에 대한 설명으로 가장 적절한 것은?",
+        options: [
+            "1. 인코더는 출력 시퀀스를 생성하고, 디코더는 입력 시퀀스를 처리한다.",
+            "2. 인코더와 디코더는 서로 독립적으로 학습되며, 따로 최적화된다.",
+            "3. 인코더는 입력 시퀀스를 고정 길이 벡터로 변환하고, 디코더는 이 벡터를 바탕으로 출력 시퀀스를 생성한다.",
+            "4. Seq2Seq는 입력과 출력의 길이가 반드시 동일해야 하는 모델이다."
+        ],
+        answer: 2, // Option 3
+        concept: "Seq2Seq 인코더-디코더(Encoder-Decoder) 구조",
+        detail: "Seq2Seq 모델은 입력 시퀀스를 읽어 고정된 크기의 컨텍스트 벡터(Context Vector)로 압축하는 인코더와, 해당 벡터로부터 타겟 시퀀스를 하나씩 생성하는 디코더로 구성됩니다.",
+        why: "Seq2Seq의 가장 큰 장점은 입력 시퀀스의 길이와 출력 시퀀스의 길이가 서로 달라도(가변 길이) 성공적으로 매핑할 수 있다는 점이며, 전체 네트워크는 역전파를 통해 End-to-End로 동시 최적화됩니다.",
+        examPoint: "Seq2Seq = 인코더(입력->고정벡터) + 디코더(고정벡터->출력), 입출력 길이 달라도 가능, End-to-End 학습."
+    },
+    {
+        id: 7,
+        question: "Attention 메커니즘의 가장 핵심적인 아이디어는 무엇인가?",
+        options: [
+            "1. 인코더를 더 크게 만들어서 더 많은 정보를 저장한다.",
+            "2. 번역/생성할 때마다 입력 문장의 어느 부분이 중요한지 선택적으로 집중한다.",
+            "3. 디코더를 여러 개 사용해서 병렬로 번역한다.",
+            "4. 입력 문장을 더 작은 단위로 나누어서 처리한다."
+        ],
+        answer: 1, // Option 2
+        concept: "어텐션 메커니즘(Attention Mechanism)의 개념",
+        detail: "Attention은 디코더가 매 타임스텝마다 출력을 생성할 때, 인코더의 모든 은닉 상태(Hidden States) 중에서 가장 관련성이 높은 부분에 동적으로 가중치를 부여합니다.",
+        why: "Seq2Seq에서 전체 입력 문장을 단 하나의 고정 길이 벡터에 압축하면서 발생하는 정보 손실(Bottleneck Problem)을 해결하기 위해 도입되었습니다.",
+        examPoint: "Attention = 고정 길이 병목현상(Bottleneck Problem) 해결, 입력의 중요한 부분에 선택적 집중(Softmax 가중합)."
+    },
+    {
+        id: 8,
+        question: "RNN에서 문장의 길이가 길어질수록 과거 시점의 정보가 손실되는 주요 원인과 이를 해결하기 위한 대표적인 기법은?",
+        options: [
+            "1. 기울기 소실(Vanishing Gradient) 문제 - LSTM / GRU / Attention",
+            "2. 데이터 오버피팅(Overfitting) - DropConnect",
+            "3. 계산량 폭증(Computational Complexity) - Softmax optimization",
+            "4. 차원의 저주(Curse of Dimensionality) - One-hot encoding"
+        ],
+        answer: 0, // Option 1
+        concept: "기울기 소실(Vanishing Gradient) 및 장기 의존성(Long-term Dependency)",
+        detail: "RNN은 역전파(Backpropagation Through Time, BPTT) 시 가중치가 지속적으로 곱해지면서 기울기가 0으로 수렴하여 먼 과거의 정보를 기억하지 못합니다.",
+        why: "이를 해결하기 위해 게이트 구조를 도입한 LSTM(Cell State 사용)이나 인코더 전체 정보를 직접 참조하는 Attention 기법이 개발되었습니다.",
+        examPoint: "RNN 한계 = 기울기 소실, 장기 의존성 학습 불능. 해결 = LSTM 게이트 메커니즘, Attention."
+    },
+    {
+        id: 9,
+        question: "LSTM(Long Short-Term Memory)의 핵심 게이트(Gate) 3가지와 그 기능의 연결이 올바른 것을 고르시오.",
+        options: [
+            "1. Forget Gate (이전 정보 유지/삭제 결정) - Input Gate (새로운 정보 저장 비율 결정) - Output Gate (다음 은닉 상태 출력 결정)",
+            "2. Reset Gate - Update Gate - Output Gate",
+            "3. Input Gate - Memory Gate - Clear Gate",
+            "4. Start Gate - Pass Gate - End Gate"
+        ],
+        answer: 0, // Option 1
+        concept: "LSTM의 3가지 게이트 구조 (Forget, Input, Output)",
+        detail: "LSTM은 Cell State를 도입하여 장기 기억을 보존하며, 시그모이드 함수를 통해 0~1 사이의 값을 출력하여 정보 흐름을 제어합니다.",
+        why: "Forget Gate는 C_(t-1)에서 버릴 정보, Input Gate는 C~_t에서 새로 보관할 정보, Output Gate는 C_t에서 다음 은닉상태 h_t로 출력할 정보를 결정합니다.",
+        examPoint: "Forget(지우기) + Input(기록하기) + Output(내보내기). Cell State = 장기 기억, Hidden State = 단기 기억."
+    },
+    {
+        id: 10,
+        question: "Seq2Seq 학습 시 디코더의 이전 타임스텝 예측값 대신 정답 토큰(Ground Truth)을 다음 입력으로 강제로 넣어주어 학습을 안정시키는 기법은?",
+        options: [
+            "1. Beam Search",
+            "2. Teacher Forcing (교사 강도)",
+            "3. Self-Attention",
+            "4. Greedy Decoding"
+        ],
+        answer: 1, // Option 2
+        concept: "티처 포싱(Teacher Forcing)",
+        detail: "학습 초기 디코더가 잘못된 단어를 예측하면 이후 모든 타임스텝 학습이 연쇄적으로 왜곡되는 현상을 막기 위해 사용되는 기법입니다.",
+        why: "디코더 입력으로 모델 본인의 이전 예측 출력이 아닌 정답(Ground Truth) 단어를 직접 주입함으로써 학습 속도를 높이고 수렴을 안정화합니다.",
+        examPoint: "Teacher Forcing = 정답 단어를 디코더 입력으로 강제 주입, 학습 안정화 및 빠른 수렴."
+    },
+    {
+        id: 11,
+        question: "Seq2Seq 추론(Inference) 과정에서 각 단계마다 가장 확률이 높은 k개의 유망한 후보 문장 경로만을 유지하며 탐색하는 알고리즘은?",
+        options: [
+            "1. Greedy Search",
+            "2. Random Search",
+            "3. Beam Search",
+            "4. Exhaustive Search"
+        ],
+        answer: 2, // Option 3
+        concept: "빔 서치(Beam Search)",
+        detail: "Greedy Search는 탐욕적으로 매 순간 최고 확률 단어만 선택하므로 전체 문장의 최적해를 놓치기 쉽습니다.",
+        why: "Beam Search는 정해진 빔 크기(Beam size = k)만큼 최고 유망 후보들을 유지하며 탐색을 수행하므로 전체 문장의 누적 로그 확률 합을 극대화합니다.",
+        examPoint: "Greedy = k=1 (되돌리기 불가), Beam Search = k개의 후보 유지 (더 높은 품질의 문장 생성)."
+    },
+    {
+        id: 12,
+        question: "어텐션(Attention) 메커니즘에서 사용되는 3가지 핵심 요소 Query, Key, Value에 대한 설명으로 옳지 않은 것은?",
+        options: [
+            "1. Query: 현재 시점에서 찾고자 하는 기준이 되는 검색어/질의 벡터 (예: 디코더의 은닉 상태)",
+            "2. Key: Query와 비교 대상이 되는 대상들의 레이블/키 벡터 (예: 인코더의 은닉 상태들)",
+            "3. Value: Key와 쌍을 이루며 actual 정보를 담고 있는 가중합 대상 벡터",
+            "4. Query와 Key의 유사도를 계산할 때 Softmax 함수를 절대 사용할 수 없다."
+        ],
+        answer: 3, // Option 4
+        concept: "Query, Key, Value (Q, K, V) 개념과 어텐션 분포",
+        detail: "Query와 Key의 내적(Dot Product) 등을 통해 유사도 점수(Score)를 계산하고, 여기에 Softmax를 적용하여 가중합 비율인 어텐션 분포(Attention Distribution)를 얻습니다.",
+        why: "Softmax 함수는 각 Key와의 유사도 점수를 합이 1인 확률 가중치로 변환해 주는 필수적인 단계입니다.",
+        examPoint: "Attention(Q, K, V) = Softmax(Score(Q, K)) * V. Query(질의), Key(비교대상), Value(실제값)."
+    },
+    {
+        id: 13,
+        question: "거대 언어 모델(LLM) 및 파운데이션 모델의 3가지 핵심 구성요소로 올바르게 짝지어진 것은?",
+        options: [
+            "1. 빅데이터(Big Data) - 자가 학습(Self-supervised Learning) - 트랜스포머(Transformer) 아키텍처",
+            "2. 지도 학습 - CNN - 이미지 코퍼스",
+            "3. 강화 학습 - RNN - 소형 데이터셋",
+            "4. 규칙 기반 알고리즘 - 원-핫 인코딩 - 하드디스크"
+        ],
+        answer: 0, // Option 1
+        concept: "텍스트 파운데이션 모델(Text Foundation Model)의 3대 요소",
+        detail: "파운데이션 모델은 대규모 인터넷 데이터, 사람의 라벨링 없이 학습하는 자가 학습(다음 토큰 예측), 그리고 이를 확장성 있게 처리하는 트랜스포머 구조의 합성으로 탄생했습니다.",
+        why: "빅데이터, Self-supervised Learning (Next Token Prediction), Transformer 아키텍처가 결합하여 거대 언어 모델의 뛰어난 범용성이 확보됩니다.",
+        examPoint: "LLM 3대 요소: Big Data, Self-Supervised Learning, Transformer."
+    },
+    {
+        id: 14,
+        question: "거대 언어 모델에서 나타나는 '창발성(Emergent Properties)'과 '규모의 법칙(Scaling Law)'에 대한 설명으로 옳은 것은?",
+        options: [
+            "1. 모델 크기가 커지면 항상 성능이 즉시 저하된다.",
+            "2. Scaling Law에 따르면 모델의 파라미터 수, 데이터량, 계산량이 증가함에 따라 손실(Loss)이 예측 가능하게 감소한다.",
+            "3. 창발성은 소형 모델에서도 아무런 차이 없이 항상 똑같이 관측된다.",
+            "4. In-Context Learning(인-컨텍스트 학습)은 창발적 능력이 아니다."
+        ],
+        answer: 1, // Option 2
+        concept: "Scaling Law(규모의 법칙) 및 Emergent Property(창발성)",
+        detail: "Kaplan 등이 제시한 Scaling Law에 따르면 계산량, 데이터 크기, 파라미터 수의 증가에 따라 Loss는 거듭제곱 법칙(Power-law) 형태로 감소합니다.",
+        why: "창발성은 일정 모델 규모(예: 10B~100B 이상 파라미터)에 도달하면 이전에는 불가능했던 능력(In-Context Learning, 추론 등)이 비약적으로 발현되는 현상을 의미합니다.",
+        examPoint: "Scaling Law = Scale 증가에 따른 Loss 지속 감소. 창발성 = 특정 임계 규모 초과 시 추론/In-Context Learning 능력 급부상."
+    },
+    {
+        id: 15,
+        question: "다음 중 개방형(Open Sourced) 거대 언어 모델과 폐쇄형(Closed) 거대 언어 모델의 예시 연결이 바르게 된 것은?",
+        options: [
+            "1. 개방형: LLaMA, Gemma, Qwen / 폐쇄형: ChatGPT, Claude, Gemini",
+            "2. 개방형: ChatGPT, Claude / 폐쇄형: LLaMA, Gemma",
+            "3. 개방형: Gemini, Claude / 폐쇄형: DeepSeek, Qwen",
+            "4. 모두 동일하며 차이가 없다."
+        ],
+        answer: 0, // Option 1
+        concept: "Open-source LLM vs Closed API LLM",
+        detail: "개방형 모델은 가중치(Weights)와 코드 등을 다운로드받아 자체 서버에 구축(On-Premise)할 수 있으며, 폐쇄형 모델은 API 요청 형태로 사용합니다.",
+        why: "Meta의 LLaMA, Google의 Gemma, Alibaba의 Qwen은 가중치가 공개된 Open Sourced 모델이며 OpenAI의 ChatGPT, Anthropic의 Claude, Google의 Gemini는 Closed API 서비스입니다.",
+        examPoint: "개방형 = 가중치 다운로드/자체구축 가능 (LLaMA 등). 폐쇄형 = API 호출 방식 (ChatGPT, Claude 등)."
+    },
+    {
+        id: 16,
+        question: "다음 인-컨텍스트 학습(In-Context Learning) 프롬프트 방식 중, 모델에게 파라미터 업데이트(Gradient Update) 없이 수 개의 예시(Demonstrations)를 제공하는 방식은?",
+        options: [
+            "1. Zero-shot Prompting",
+            "2. One-shot Prompting",
+            "3. Few-shot Prompting",
+            "4. Fine-tuning"
+        ],
+        answer: 2, // Option 3
+        concept: "In-Context Learning (Zero-shot, One-shot, Few-shot)",
+        detail: "인-컨텍스트 학습은 모델의 가중치를 새로 업데이트하지 않고, 입력 프롬프트 내에 지시사항과 예시를 전달하여 새로운 작업을 수행하게 만듭니다.",
+        why: "Zero-shot은 예시 0개, One-shot은 예시 1개, Few-shot은 여러 개(보통 2~5개 이상)의 예시를 프롬프트에 포함시키는 기법입니다.",
+        examPoint: "Few-shot = 프롬프트에 2개 이상의 예시 제공. 파라미터 역전파/업데이트(Gradient update) 없음."
+    },
+    {
+        id: 17,
+        question: "Word2Vec의 Skip-gram 모델에서 윈도우 크기(Window Size)가 2로 설정되었을 때, 중심 단어 'banking' (위치 t) 주변에 위치하는 문맥 단어의 설명으로 옳지 않은 것은?\n문장: '... problems turning into banking crises as ...'",
+        options: [
+            "1. 윈도우 크기가 2이면 앞뒤로 각각 2개씩, 총 4개의 단어가 주변 단어가 된다.",
+            "2. 중심 단어 banking에 대한 주변 단어 집합은 {problems, turning, crises, as}이다.",
+            "3. 중심 단어 banking에 대한 주변 단어 집합은 {turning, into, crises, as}이다.",
+            "4. Skip-gram은 중심 단어 'banking'을 통해 이 주변 단어들이 등장할 확률을 예측하도록 학습한다."
+        ],
+        answer: 1, // Option 2 (Incorrect selection)
+        concept: "Skip-gram의 윈도우 크기(Window Size) 및 문맥 단어 추출",
+        detail: "위치 t인 'banking'을 기준으로 직전 2개 단어(t-2, t-1)는 'turning', 'into'이고 직후 2개 단어(t+1, t+2)는 'crises', 'as'입니다.",
+        why: "'problems'는 t-3 위치에 있으므로 윈도우 크기 2 범위에 포함되지 않습니다. 따라서 {turning, into, crises, as}가 올바른 주변 단어 집합입니다.",
+        examPoint: "Window size = c일 때 중심 단어 w_t 기준 앞 c개, 뒤 c개 총 2c개의 주변 단어가 포함됨."
+    },
+    {
+        id: 18,
+        question: "기계 번역 평가 지표 중 하나로, 생성된 번역 문장이 사람이 번역한 참조(Reference) 문장과 얼마나 유사한지를 n-gram 정밀도(Precision) 기반으로 측정하는 지표는?",
+        options: [
+            "1. Perplexity (PPL)",
+            "2. BLEU (Bilingual Evaluation Understudy)",
+            "3. Accuracy",
+            "4. MSE (Mean Squared Error)"
+        ],
+        answer: 1, // Option 2
+        concept: "BLEU Score (기계 번역 평가 지표)",
+        detail: "BLEU는 번역된 텍스트와 원문 참조 번역 간의 n-gram 일치율(Precision)을 계산하며, 짧은 문장 오남용을 막기 위한 Brevity Penalty를 포함합니다.",
+        why: "BLEU(Bilingual Evaluation Understudy) score는 기계 번역 모델의 품질을 사람이 번역한 문장과 비교 평가하기 위해 보편적으로 사용하는 지표입니다.",
+        examPoint: "BLEU score = 기계번역 평가 지표, n-gram 정밀도(Precision) 기반."
+    },
+    {
+        id: 19,
+        question: "언어 모델의 성능 평가 지표 중 하나로, 모델이 다음 단어를 예측할 때 느끼는 '분선성/혼잡도'를 나타내며, 값이 낮을수록 성능이 좋음을 의미하는 지표는?",
+        options: [
+            "1. Perplexity (PPL)",
+            "2. BLEU score",
+            "3. Cosine Similarity",
+            "4. Word Error Rate (WER)"
+        ],
+        answer: 0, // Option 1
+        concept: "Perplexity (PPL, 헷갈리는 정도)",
+        detail: "Perplexity는 문장의 조건부 확률의 역수에 대한 기하평균값으로, 낮을수록 모델이 다음 단어를 높은 확신을 가지고 잘 예측함을 뜻합니다.",
+        why: "PPL이 10이라는 것은 다음 단어를 선택할 때 평균 10개의 후보 중에서 헷갈리고 있다는 의미이므로, PPL 숫자가 낮을수록 우수한 언어 모델입니다.",
+        examPoint: "Perplexity(PPL) 낮을수록 뛰어난 언어모델. (PPL = 다음 단어 예측 시 헷갈리는 분갈 후보 수)."
+    },
+    {
+        id: 20,
+        question: "순차적 데이터(Sequential Data)의 핵심 특징 3가지에 해당하지 않는 것은?",
+        options: [
+            "1. 순서가 중요하다 (데이터의 순서가 바뀌면 의미가 달라짐)",
+            "2. 장기 의존성(Long-term dependency)이 존재한다",
+            "3. 데이터의 길이가 항상 고정되어 있다 (Fixed Length)",
+            "4. 가변 길이(Variable length) 특성을 갖는다"
+        ],
+        answer: 2, // Option 3
+        concept: "순차적 데이터(Sequential Data)의 3대 특징",
+        detail: "오디오, 텍스트, 비디오 등의 순차적 데이터는 입력 순서, 멀리 떨어진 과거 정보의 영향(장기 의존성), 문장마다 단어 수가 다른 가변 길이를 갖습니다.",
+        why: "순차적 데이터는 길이가 제각각이므로 고정 길이가 아니라 '가변 길이(Variable length)'를 가지는 것이 핵심 특징입니다.",
+        examPoint: "시퀀스 데이터 특징: 1. 순서 중요, 2. 장기 의존성, 3. 가변 길이."
+    },
+    {
+        id: 21,
+        question: "RNN의 계산식 h_t = tanh(W_hh * h_(t-1) + W_xh * x_t + b) 에 대한 설명으로 옳지 않은 것은?",
+        options: [
+            "1. h_t는 현재 시점 t의 새로운 은닉 상태(Hidden State)이다.",
+            "2. h_(t-1)은 이전 시점 t-1의 은닉 상태이다.",
+            "3. 각 시점(Time step)마다 사용하는 가중치 매개변수 W_hh, W_xh는 서로 다른 값으로 매번 새롭게 초기화된다.",
+            "4. tanh 활성화 함수는 출력값을 -1과 1 사이로 압축한다."
+        ],
+        answer: 2, // Option 3
+        concept: "RNN 은닉 상태 계산 및 파라미터 공유(Parameter Sharing)",
+        detail: "RNN은 시퀀스의 모든 타임스텝 t에 대해 동일한 가중치 Matrix (W_hh, W_xh, W_hy)를 공유하여 사용합니다.",
+        why: "각 시점마다 동일한 가중치를 재활용(Parameter Sharing)하기 때문에 파라미터 효율성이 높으며 입력 길이가 달라져도 적용 가능합니다.",
+        examPoint: "RNN은 모든 time step에서 동일한 가중치(W_hh, W_xh)를 공유함."
+    },
+    {
+        id: 22,
+        question: "Transformer 모델의 셀프 어텐션(Self-Attention) 메커니즘에서 scaled dot-product attention 수식 'Softmax( (Q * K^T) / sqrt(d_k) ) * V' 에 관한 설명으로 옳지 않은 것은?",
+        options: [
+            "1. Q, K, V는 동일한 입력 시퀀스로부터 각각 서로 다른 가중치 행렬을 곱해 생성된다.",
+            "2. sqrt(d_k)로 나누어주는 스케일링(Scaling)은 차원 d_k가 커질 때 내적값이 커져 Softmax의 기울기가 소실되는 것을 방지한다.",
+            "3. Q와 K^T의 곱을 통해 단어 간 상호 유사도 점수를 계산한다.",
+            "4. V(Value)는 유사도 점수 계산 과정에만 쓰이고 최종 output 가중합에는 전혀 반영되지 않는다."
+        ],
+        answer: 3, // Option 4
+        concept: "Self-Attention 수식 및 Scaled Dot-Product Attention",
+        detail: "Attention(Q, K, V) = Softmax( (Q * K^T) / sqrt(d_k) ) * V 수식에서 Q*K^T로 점수를 구하고 Softmax로 어텐션 가중치를 만든 뒤, 이를 V(Value)와 가중합하여 최종 컨텍스트 결과를 만듭니다.",
+        why: "V(Value)는 어텐션 가중치와 직접 곱해져(가중합) 최종 Output 벡터를 생성하는 핵심 요소입니다.",
+        examPoint: "Scaled Dot-Product Attention: sqrt(d_k) 스케일링으로 Softmax 기울기 소실 방지, V와 가중합."
+    },
+    {
+        id: 23,
+        question: "Transformer 아키텍처에서 순간적인 병렬 처리로 인해 손실되는 '단어 위치 정보(Sequence Order)'를 모델에 제공하기 위해 입력 임베딩에 더해주는 기법은?",
+        options: [
+            "1. Positional Encoding (위치 인코딩)",
+            "2. Layer Normalization",
+            "3. Multi-Head Attention",
+            "4. Dropout"
+        ],
+        answer: 0, // Option 1
+        concept: "포지셔널 인코딩(Positional Encoding)",
+        detail: "RNN과 달리 Transformer는 순차적으로 입력받지 않고 전체 문장을 한 번에 병렬 처리하므로 단어의 위치 정보가 포함되지 않습니다.",
+        why: "사인(sin) 및 코사인(cos) 주기함수 등을 활용한 Positional Encoding 벡터를 입력 임베딩 벡터에 더해줌으로써 위치 순서 정보를 모델에 전달합니다.",
+        examPoint: "Transformer = Recurrence 없음. 위치 정보 보완을 위해 Positional Encoding을 임베딩에 합산."
+    },
+    {
+        id: 24,
+        question: "Transformer의 Multi-Head Attention에 대한 설명으로 가장 옳은 것은?",
+        options: [
+            "1. Single Head Attention을 여러 번 반복하므로 항상 단일 표현 공간만 집중해서 본다.",
+            "2. 어텐션을 h개의 서로 다른 헤드(Subspaces)로 나누어 병렬 수행함으로써, 단어들 간의 다양한 관계와 문맥적 정보를 동시에 포착한다.",
+            "3. 입력 데이터를 여러 개의 파트로 잘라 서로 다른 디코더에 분산하는 기술이다.",
+            "4. 순단 신경망(RNN)을 여러 개 겹쳐 쌓은 구조를 의미한다."
+        ],
+        answer: 1, // Option 2
+        concept: "멀티 헤드 어텐션(Multi-Head Attention)",
+        detail: "Q, K, V를 여러 개의 헤드로 나누어(d_model / h 차원) 각기 다른 사상 공간에서 어텐션을 수행한 후 결합(Concatenate)합니다.",
+        why: "단일 어텐션보다 여러 헤드가 서로 다른 부분(예: 문법적 관계, 의미적 관계, 위치적 관계 등)에 동시에 집중할 수 있어 다양한 문맥 표현을 학습합니다.",
+        examPoint: "Multi-Head Attention = h개의 서로 다른 공간에서 다양한 관계를 동시에 다각도로 포착."
+    },
+    {
+        id: 25,
+        question: "Transformer 디코더(Decoder)의 셀프 어텐션 블록에서 미래 타임스텝의 단어를 참조하지 못하도록 차단하는 기법은?",
+        options: [
+            "1. Masked Multi-Head Attention",
+            "2. Cross Attention",
+            "3. Feed Forward Neural Network",
+            "4. Encoder Self-Attention"
+        ],
+        answer: 0, // Option 1
+        concept: "마스크드 셀프 어텐션(Masked Self-Attention)",
+        detail: "디코더는 학습 시에도 이전까지 생성된 단어들만 보고 다음 단어를 예측해야 하므로, 미래 타임스텝 위치에 마스킹(-inf)을 적용합니다.",
+        why: "Masked Multi-Head Attention을 사용하여 타임스텝 t 이후의 위치에 어텐션 가중치가 주어지지 않도록(Softmax 후 0이 되도록) 차단합니다.",
+        examPoint: "Decoder의 Self-Attention = Masked Attention 적용 (미래 단어 정보 유출 방지)."
+    },
+    {
+        id: 26,
+        question: "BERT(Bidirectional Encoder Representations from Transformers)와 GPT(Generative Pre-trained Transformer)의 아키텍처적 구조 차이에 대한 설명으로 올바른 것은?",
+        options: [
+            "1. BERT는 Transformer의 Decoder 기반이고, GPT는 Encoder 기반이다.",
+            "2. BERT는 Transformer의 Encoder 기반(양방향 문맥 참조)이고, GPT는 Decoder 기반(단방향 순방향 생성)이다.",
+            "3. BERT와 GPT 모두 RNN을 기본 뼈대로 사용한다.",
+            "4. BERT는 단방향 모델이고 GPT는 양방향 모델이다."
+        ],
+        answer: 1, // Option 2
+        concept: "BERT (Encoder-only) vs GPT (Decoder-only)",
+        detail: "BERT는 Transformer 인코더를 사용하여 앞뒤 전체 양방향(Bidirectional) 문맥을 파악하며, GPT는 트랜스포머 디코더를 사용하여 이전 단어들로부터 다음 단어를 예측하는 단방향(Causal) 모델입니다.",
+        why: "BERT는 MLM(Masked LM)을 통해 텍스트 이해 및 분류에 특화되어 있고, GPT는 Causal LM을 통해 자연어 생성 작업에 특화되어 있습니다.",
+        examPoint: "BERT = Transformer Encoder (양방향, 문맥 이해/분류). GPT = Transformer Decoder (단방향, 자연어 생성)."
+    },
+    {
+        id: 27,
+        question: "다음 중 분포 가설(Distributional Hypothesis)의 핵심 명제로 올바른 것은?",
+        options: [
+            "1. '단어의 의미는 그 단어 자체의 글자 모양에 의해 결정된다.'",
+            "2. '비슷한 문맥에서 등장하는 단어들은 비슷한 의미를 가진다.' (You shall know a word by the company it keeps)",
+            "3. '단어의 의미는 사전적 정의에 의해서만 결정된다.'",
+            "4. '모든 단어는 서로 독립적인 가중치를 갖는다.'"
+        ],
+        answer: 1, // Option 2
+        concept: "분포 가설(Distributional Hypothesis)",
+        detail: "Firth(1957)가 제안한 자연어 처리의 핵심 가설로, 단어의 의미는 그 단어가 자주 함께 쓰이는 주변 단어들의 분포에 의해 형성된다는 법칙입니다.",
+        why: "Word2Vec, FastText 등 현대 워드 임베딩 기술은 모두 이 분포 가설('주변 단어를 보면 중심 단어의 의미를 알 수 있다')에 기반하여 학습됩니다.",
+        examPoint: "분포 가설 = 유사한 문맥에 등장하는 단어는 유사한 의미를 가짐 (Word2Vec의 이론적 토대)."
+    },
+    {
+        id: 28,
+        question: "전통적 통계 기반 기계 번역(SMT: Statistical Machine Translation)과 비교하였을 때, 신경망 기계 번역(NMT: Neural Machine Translation)의 대표적인 장점이 아닌 것은?",
+        options: [
+            "1. End-to-End 학습이 가능하여 전체 모델을 한 번에 최적화할 수 있다.",
+            "2. 수작업으로 피처(Feature)를 엔지니어링하거나 수많은 언어별 규칙을 만들 필요가 없다.",
+            "3. 연속적인 밀집 벡터 표현을 사용하여 문맥 정보를 더 풍부하게 반영한다.",
+            "4. 문장의 길이가 100단어 이상으로 길어져도 성능 저하나 정보 손실이 절대로 발생하지 않는다."
+        ],
+        answer: 3, // Option 4
+        concept: "SMT vs NMT 및 NMT의 특성",
+        detail: "NMT는 신경망 기반으로 고성능을 내지만, Attention이 없거나 문장이 극도로 길어지면 여전히 장기 의존성 및 성능 감소 문제가 완벽히 자유롭지는 않습니다.",
+        why: "NMT의 장점은 End-to-End 최적화, 자동 피처 학습, 밀집 표현 활용이지만, 문장이 매우 길어질 경우 정보 손실이 완벽히 0이 된다는 설명은 오류입니다.",
+        examPoint: "NMT 장점 = End-to-End 학습, 파이프라인 단축, 의미 벡터 표현. (단, 장기 의존성 관리는 별도 어텐션 필요)."
+    },
+    {
+        id: 29,
+        question: "언어 모델에서 문장을 생성할 때, 가장 높은 확률을 가진 단어를 무조건 선택하는 탐욕적 방식(Greedy Decoding)의 한계점으로 가장 적절한 것은?",
+        options: [
+            "1. 계산 속도가 너무 느려서 실시간 사용이 불가능하다.",
+            "2. 순간의 선택이 전체 문장의 확률을 극대화함을 보장하지 못하며, 한번 잘못 선택한 단어를 중간에 수정/되돌리기(Backtrack)할 수 없다.",
+            "3. 항상 동일한 문장만 출력되는 것이 아니라 매번 난수가 생성된다.",
+            "4. 메모리 사용량이 Beam Search보다 훨씬 많이 요구된다."
+        ],
+        answer: 1, // Option 2
+        concept: "Greedy Decoding의 한계점",
+        detail: "Greedy Search는 매 타임스텝마다 현재 순간의 P(w_t | w_<t)가 가장 높은 단어를 고르는 국소적(Local) 최적화 방식입니다.",
+        why: "초반 단계에서 잘못된 단어를 고르면 문장 전체의 누적 확률이 크게 떨어질 수 있으며, 되돌아갈 수 없으므로 전체 문장 차원의 대역적(Global) 최적해를 찾지 못합니다.",
+        examPoint: "Greedy Decoding = 매 순간 최고 확률 선택, 되돌리기 불가능, 전체 문장 최적해 보장 불가."
+    },
+    {
+        id: 30,
+        question: "다음 중 Transformer 모델 구조에서 잔차 연결(Residual Connection)과 레이어 정규화(Layer Normalization)의 주된 역할은 무엇인가?",
+        options: [
+            "1. 단어의 의미 벡터 차원을 줄이는 역 할",
+            "2. 깊은 신경망 학습 시 기울기 소실/폭발(Vanishing/Exploding Gradient)을 방지하고 학습을 안정화하는 역할",
+            "3. 문장의 순서를 섞어주는 역할",
+            "4. 단어 임베딩을 원-핫 벡터로 변환하는 역할"
+        ],
+        answer: 1, // Option 2
+        concept: "Residual Connection (잔차 연결) 및 Layer Normalization",
+        detail: "Transformer 서브층(Sub-layer)마다 Add & Norm 구조 (x + SubLayer(x))가 적용됩니다.",
+        why: "잔차 연결(Residual Connection)은 역전파 시 기울기가 직접 전달되는 통로를 제공하고, Layer Norm은 입력 분포를 안정화하여 수백 층의 깊은 모델도 안정적으로 학습할 수 있게 지원합니다.",
+        examPoint: "Add & Norm (잔차 연결 + 레이어 정규화) = 기울기 소실 방지, 학습 안정화."
+    },
+    {
+        id: 31,
+        question: "다음 중 LLM의 Fine-tuning 방식 중, 전체 매개변수를 재학습하는 대신 소수의 추가 파라미터만 효율적으로 학습하는 PEFT(Parameter-Efficient Fine-Tuning)의 대표적 기법은?",
+        options: [
+            "1. LoRA (Low-Rank Adaptation)",
+            "2. Word2Vec",
+            "3. Greedy Search",
+            "4. One-hot Encoding"
+        ],
+        answer: 0, // Option 1
+        concept: "LoRA (Low-Rank Adaptation) 및 PEFT",
+        detail: "LoRA는 기존 Pre-trained 가중치는 고정(Freeze)하고, 가중치 변화량 ΔW를 저랭크(Low-rank) 행렬 분해(A * B) 형태로 도입하여 학습할 파라미터 수를 99% 이상 줄입니다.",
+        why: "LoRA는 적은 GPU 메모리와 비용으로 대형 모델을 특정 작업에 맞춰 빠르게 미세조정(Fine-tuning)할 수 있는 대표적인 PEFT 기법입니다.",
+        examPoint: "LoRA = 저랭크 행렬 분해 기반 PEFT 기법 (기존 가중치 고정 + 소량 파라미터만 학습)."
+    },
+    {
+        id: 32,
+        question: "LLM이 거짓 정보나 사실이 아닌 내용을 마치 진실인 것처럼 유창하게 생성해내는 현상을 무엇이라 하는가?",
+        options: [
+            "1. Overfitting (과적합)",
+            "2. Hallucination (환각 현상)",
+            "3. Catastrophic Forgetting (파괴적 망각)",
+            "4. Underfitting (과소적합)"
+        ],
+        answer: 1, // Option 2
+        concept: "Hallucination (LLM의 환각 현상)",
+        detail: "LLM은 다음 단어의 확률 분포에 따라 텍스트를 연쇄 생성하는 통계적 모델이므로, 사실 검증 없이 신뢰도 높은 어조로 허위 정보를 생성할 수 있습니다.",
+        why: "이러한 현상을 Hallucination(환각)이라 부르며, 이를 완화하기 위해 RAG(검색 증강 생성)나 RLHF(인간 피드백 기반 강화학습) 등이 활용됩니다.",
+        examPoint: "Hallucination = LLM이 사실과 다른 허위 정보를 유창하게 거짓 생성하는 현상."
+    },
+    {
+        id: 33,
+        question: "LLM에 외부 데이터베이스나 검색 엔진을 결합하여, 질문과 관련된 검증된 문서를 실시간으로 검색한 후 이를 바탕으로 정확한 답변을 생성하도록 돕는 기법은?",
+        options: [
+            "1. RAG (Retrieval-Augmented Generation, 검색 증강 생성)",
+            "2. Continuous Bag of Words (CBOW)",
+            "3. Teacher Forcing",
+            "4. Beam Search"
+        ],
+        answer: 0, // Option 1
+        concept: "RAG (Retrieval-Augmented Generation)",
+        detail: "RAG는 사용자의 질의(Query)에 대해 검증된 최신 외부 문서를 벡터 DB 등에서 검색(Retrieval)해오고, 그 문서를 LLM의 프롬프트 컨텍스트로 제공하여 답변을 생성(Generation)합니다.",
+        why: "RAG를 활용하면 환각(Hallucination) 현상을 대폭 감소시키고 최신 정보 및 기업 내부 보안 데이터를 모델 재학습 없이 최신 상태로 반영할 수 있습니다.",
+        examPoint: "RAG = 검색(Retrieval) + 생성(Generation). 환각 완화 및 최신/외부 지식 반영의 핵심 기술."
+    },
+    {
+        id: 34,
+        question: "다음 중 인간의 선호도 데이터를 바탕으로 보상 모델(Reward Model)을 학습시키고, 이를 통해 LLM이 사람의 의도 및 윤리적 지침에 맞게 답변하도록 정렬(Alignment)하는 기법은?",
+        options: [
+            "1. RLHF (Reinforcement Learning from Human Feedback)",
+            "2. Self-Attention",
+            "3. Pre-training",
+            "4. Positional Encoding"
+        ],
+        answer: 0, // Option 1
+        concept: "RLHF (인간 피드백 기반 강화학습)",
+        detail: "사전 학습된 LLM을 인간의 의도(Helpful, Honest, Harmless)에 맞추기 위해 사용자의 선호 순위 데이터를 기반으로 Reward Model을 만들고 PPO 알고리즘 등으로 강화학습을 수행합니다.",
+        why: "RLHF(Reinforcement Learning from Human Feedback)는 InstructGPT, ChatGPT 등 최신 LLM 정렬(Alignment)의 핵심 단계입니다.",
+        examPoint: "RLHF = 인간 피드백 기반 강화학습, 모델의 안전성/지시 이행 정렬(Alignment) 수행."
+    }
+];
+
+// ==========================================
+// 2. STATE MANAGEMENT
+// ==========================================
+let currentMode = 'study'; // 'study' or 'exam'
+let currentIndex = 0;
+let userAnswers = {}; // { questionId: selectedOptionIndex }
+let userStates = {};  // { questionId: 'unanswered' | 'correct' | 'incorrect' | 'revealed' }
+let activeQuestionSet = [...questions]; // Array of active question objects
+
+// Initialize state store
+function initState() {
+    userAnswers = {};
+    userStates = {};
+    questions.forEach(q => {
+        userStates[q.id] = 'unanswered';
+    });
+}
+
+// ==========================================
+// 3. CORE APP LOGIC
+// ==========================================
+function startApp(mode) {
+    currentMode = mode;
+    activeQuestionSet = [...questions];
+    initState();
+    currentIndex = 0;
+
+    document.getElementById('start-screen').classList.remove('active');
+    document.getElementById('result-screen').classList.remove('active');
+    document.getElementById('quiz-screen').classList.add('active');
+
+    document.getElementById('mode-badge').innerText = mode === 'study' ? '📚 학습 모드' : '📝 시험 모드';
+
+    // Adjust button visibility based on mode
+    if (mode === 'exam') {
+        document.getElementById('btn-show-ans').style.display = 'none';
+        document.getElementById('btn-show-exp').style.display = 'none';
+        document.getElementById('btn-finish-exam').style.display = 'inline-flex';
+    } else {
+        document.getElementById('btn-show-ans').style.display = 'inline-flex';
+        document.getElementById('btn-show-exp').style.display = 'inline-flex';
+        document.getElementById('btn-finish-exam').style.display = 'none';
+    }
+
+    renderNavGrid();
+    renderQuestion();
+}
+
+function switchMode(mode) {
+    startApp(mode);
+}
+
+function renderNavGrid() {
+    const grid = document.getElementById('nav-grid');
+    grid.innerHTML = '';
+
+    activeQuestionSet.forEach((q, idx) => {
+        const item = document.createElement('div');
+        const state = userStates[q.id] || 'unanswered';
+        item.className = `nav-item ${state} ${idx === currentIndex ? 'current' : ''}`;
+        item.innerText = idx + 1;
+        item.onclick = () => jumpToQuestion(idx);
+        grid.appendChild(item);
+    });
+
+    updateProgress();
+}
+
+function updateProgress() {
+    const total = activeQuestionSet.length;
+    let correct = 0, incorrect = 0, revealed = 0, unanswered = 0;
+
+    activeQuestionSet.forEach(q => {
+        const st = userStates[q.id];
+        if (st === 'correct') correct++;
+        else if (st === 'incorrect') incorrect++;
+        else if (st === 'revealed') revealed++;
+        else unanswered++;
+    });
+
+    const answeredCount = total - unanswered;
+    const pct = Math.round((answeredCount / total) * 100);
+
+    document.getElementById('progress-text').innerText = `문제 ${currentIndex + 1} / ${total}`;
+    document.getElementById('progress-percent').innerText = `${pct}%`;
+    document.getElementById('progress-fill').style.width = `${pct}%`;
+
+    document.getElementById('count-correct').innerText = correct;
+    document.getElementById('count-incorrect').innerText = incorrect;
+    document.getElementById('count-revealed').innerText = revealed;
+    document.getElementById('count-unanswered').innerText = unanswered;
+}
+
+function renderQuestion() {
+    const q = activeQuestionSet[currentIndex];
+    const qState = userStates[q.id];
+    const selectedOpt = userAnswers[q.id];
+
+    document.getElementById('q-number').innerText = `문제 ${String(currentIndex + 1).padStart(2, '0')}`;
+    document.getElementById('q-text').innerText = q.question;
+
+    const optContainer = document.getElementById('options-container');
+    optContainer.innerHTML = '';
+
+    q.options.forEach((optText, optIdx) => {
+        const optCard = document.createElement('label');
+        let cardClass = 'option-card';
+
+        if (selectedOpt === optIdx) {
+            cardClass += ' selected';
+        }
+
+        // Show feedback style if answered/revealed in Study Mode
+        if (currentMode === 'study' && (qState === 'correct' || qState === 'incorrect' || qState === 'revealed')) {
+            if (optIdx === q.answer) {
+                cardClass += ' correct-opt';
+            } else if (selectedOpt === optIdx && optIdx !== q.answer) {
+                cardClass += ' incorrect-opt';
+            }
+        }
+
+        optCard.className = cardClass;
+
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'quiz-option';
+        radio.value = optIdx;
+        radio.checked = selectedOpt === optIdx;
+        radio.onchange = () => selectOption(optIdx);
+
+        if (currentMode === 'study' && (qState === 'correct' || qState === 'incorrect' || qState === 'revealed')) {
+            radio.disabled = true;
+        }
+
+        const spanText = document.createElement('span');
+        spanText.className = 'option-text';
+        spanText.innerText = optText;
+
+        optCard.appendChild(radio);
+        optCard.appendChild(spanText);
+
+        // Badges in study mode
+        if (currentMode === 'study' && (qState === 'correct' || qState === 'incorrect' || qState === 'revealed')) {
+            if (optIdx === q.answer) {
+                const badge = document.createElement('span');
+                badge.className = 'option-badge';
+                badge.innerText = '✓ 정답';
+                optCard.appendChild(badge);
+            } else if (selectedOpt === optIdx && optIdx !== q.answer) {
+                const badge = document.createElement('span');
+                badge.className = 'option-badge';
+                badge.innerText = '✗ 내가 선택한 답';
+                optCard.appendChild(badge);
+            }
+        }
+
+        optContainer.appendChild(optCard);
+    });
+
+    // Reset feedback & explanation panels
+    const fbArea = document.getElementById('feedback-area');
+    const expCard = document.getElementById('explanation-card');
+    fbArea.className = 'feedback-area';
+    fbArea.innerHTML = '';
+    expCard.classList.remove('active');
+
+    // Restore feedback state if already answered in study mode
+    if (currentMode === 'study') {
+        if (qState === 'correct') {
+            showFeedback(true, selectedOpt, q.answer, q);
+            showExplanation(q);
+        } else if (qState === 'incorrect') {
+            showFeedback(false, selectedOpt, q.answer, q);
+            showExplanation(q);
+        } else if (qState === 'revealed') {
+            showRevealedFeedback(q);
+            showExplanation(q);
+        }
+    }
+
+    // Button states
+    document.getElementById('btn-prev').disabled = currentIndex === 0;
+    document.getElementById('btn-next').disabled = currentIndex === activeQuestionSet.length - 1;
+
+    renderNavGrid();
+}
+
+function selectOption(optIdx) {
+    const q = activeQuestionSet[currentIndex];
+    if (currentMode === 'study' && userStates[q.id] !== 'unanswered') return;
+
+    userAnswers[q.id] = optIdx;
+    renderQuestion();
+}
+
+function submitAnswer() {
+    const q = activeQuestionSet[currentIndex];
+    const selected = userAnswers[q.id];
+
+    if (selected === undefined) {
+        alert('답안을 선택해주세요!');
+        return;
+    }
+
+    if (selected === q.answer) {
+        userStates[q.id] = 'correct';
+    } else {
+        userStates[q.id] = 'incorrect';
+    }
+
+    renderQuestion();
+}
+
+function revealAnswer() {
+    const q = activeQuestionSet[currentIndex];
+    userStates[q.id] = 'revealed';
+    renderQuestion();
+}
+
+function showFeedback(isCorrect, userOpt, correctOpt, q) {
+    const fbArea = document.getElementById('feedback-area');
+    fbArea.className = `feedback-area active ${isCorrect ? 'correct-fb' : 'incorrect-fb'}`;
+
+    if (isCorrect) {
+        fbArea.innerHTML = `
+            <div class="feedback-title">🎉 정답입니다!</div>
+            <div>• 선택한 답: ${q.options[userOpt]}</div>
+            <div>• 정답: ${q.options[correctOpt]}</div>
+        `;
+    } else {
+        fbArea.innerHTML = `
+            <div class="feedback-title">❌ 오답입니다.</div>
+            <div>• 내가 선택한 답: ${q.options[userOpt]}</div>
+            <div>• 올바른 정답: ${q.options[correctOpt]}</div>
+            <div style="margin-top: 8px;">• <strong>핵심 개념:</strong> ${q.concept}</div>
+        `;
+    }
+}
+
+function showRevealedFeedback(q) {
+    const fbArea = document.getElementById('feedback-area');
+    fbArea.className = 'feedback-area active revealed-fb';
+    fbArea.innerHTML = `
+        <div class="feedback-title">🟡 정답 확인 상태</div>
+        <div>• 정답: <strong>${q.options[q.answer]}</strong></div>
+        <div style="margin-top:4px;">• 핵심 개념: ${q.concept}</div>
+    `;
+}
+
+function toggleExplanation() {
+    const expCard = document.getElementById('explanation-card');
+    const q = activeQuestionSet[currentIndex];
+    if (expCard.classList.contains('active')) {
+        expCard.classList.remove('active');
+    } else {
+        showExplanation(q);
+    }
+}
+
+function showExplanation(q) {
+    const expCard = document.getElementById('explanation-card');
+    document.getElementById('exp-correct').innerText = `${q.answer + 1}번 - ${q.options[q.answer]}`;
+    document.getElementById('exp-concept').innerText = q.concept;
+    document.getElementById('exp-detail').innerText = q.detail;
+    document.getElementById('exp-why').innerText = q.why;
+    document.getElementById('exp-point').innerText = q.examPoint;
+    expCard.classList.add('active');
+}
+
+function nextQuestion() {
+    if (currentIndex < activeQuestionSet.length - 1) {
+        currentIndex++;
+        renderQuestion();
+    }
+}
+
+function prevQuestion() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+    }
+}
+
+function jumpToQuestion(idx) {
+    currentIndex = idx;
+    renderQuestion();
+}
+
+function finishQuiz() {
+    const total = activeQuestionSet.length;
+    let correct = 0, incorrect = 0, revealed = 0, unanswered = 0;
+
+    activeQuestionSet.forEach(q => {
+        const st = userStates[q.id];
+        if (st === 'correct') correct++;
+        else if (st === 'incorrect') incorrect++;
+        else if (st === 'revealed') revealed++;
+        else unanswered++;
+    });
+
+    const score = Math.round((correct / total) * 100);
+
+    document.getElementById('quiz-screen').classList.remove('active');
+    document.getElementById('result-screen').classList.add('active');
+
+    document.getElementById('final-score').innerText = `${score}점`;
+    document.getElementById('final-rate').innerText = `정답률 ${score}%`;
+    document.getElementById('res-total').innerText = total;
+    document.getElementById('res-correct').innerText = correct;
+    document.getElementById('res-incorrect').innerText = incorrect;
+    document.getElementById('res-revealed').innerText = revealed;
+    document.getElementById('res-unanswered').innerText = unanswered;
+
+    const btnRetryWrong = document.getElementById('btn-retry-wrong');
+    if (incorrect === 0) {
+        btnRetryWrong.style.display = 'none';
+    } else {
+        btnRetryWrong.style.display = 'inline-flex';
+    }
+}
+
+function restartQuiz(type) {
+    if (type === 'all') {
+        startApp(currentMode);
+    } else if (type === 'incorrect') {
+        const wrongQs = questions.filter(q => userStates[q.id] === 'incorrect');
+        if (wrongQs.length === 0) {
+            alert('틀린 문제가 없습니다!');
+            return;
+        }
+        activeQuestionSet = wrongQs;
+        initState();
+        currentIndex = 0;
+
+        document.getElementById('result-screen').classList.remove('active');
+        document.getElementById('quiz-screen').classList.add('active');
+
+        renderNavGrid();
+        renderQuestion();
+    }
+}
+
+// Double Check Verification on Load
+window.onload = function() {
+    console.log(`[시스템 검수 완료] 총 ${questions.length}개 문제 정상 로드됨.`);
+};
+</script>
+</body>
+</html>

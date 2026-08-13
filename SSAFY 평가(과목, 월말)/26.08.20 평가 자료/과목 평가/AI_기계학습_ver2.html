@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & 기계학습 시험 대비 대시보드</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Start Screen */
+        .start-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .mode-btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 24px;
+            width: 280px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .mode-btn:hover {
+            background: #f0fdf4;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .mode-btn h3 {
+            color: var(--primary);
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+        }
+
+        .mode-btn p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Top Progress Bar & Stats */
+        .dashboard-header {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .stat-box {
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .stat-box .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .stat-box .value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Navigation Matrix */
+        .nav-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 8px;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-main);
+            transition: all 0.1s;
+        }
+
+        .nav-item.active {
+            border-color: var(--primary);
+            border-width: 2px;
+        }
+
+        .nav-item.unanswered { background: #f8fafc; color: var(--text-muted); }
+        .nav-item.correct { background: #d1fae5; color: #065f46; border-color: #10b981; }
+        .nav-item.incorrect { background: #fee2e2; color: #991b1b; border-color: #ef4444; }
+        .nav-item.revealed { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
+
+        /* Question Card */
+        .question-card {
+            background: var(--card-bg);
+            padding: 28px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .question-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            word-break: keep-all;
+        }
+
+        .options-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .option-item:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .option-item input[type="radio"] {
+            margin-right: 14px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        .option-item.correct-bg {
+            background: #ecfdf5 !important;
+            border-color: var(--success) !important;
+            color: #065f46;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect-bg {
+            background: #fef2f2 !important;
+            border-color: var(--danger) !important;
+            color: #991b1b;
+        }
+
+        .feedback-badge {
+            margin-left: auto;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Action Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: #e2e8f0; color: var(--text-main); }
+        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-info { background: var(--info); color: white; }
+        .btn-info:hover { background: #2563eb; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Explanation Box */
+        .explanation-box {
+            display: none;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .explanation-box.active {
+            display: block;
+        }
+
+        .explanation-section {
+            margin-bottom: 14px;
+        }
+
+        .explanation-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .explanation-title-tag {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        /* Result Screen */
+        .result-card {
+            background: var(--card-bg);
+            padding: 36px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .result-score {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 16px 0;
+        }
+
+        .result-stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .question-card { padding: 18px; }
+            .mode-btn { width: 100%; }
+            .btn { width: 100%; margin-bottom: 4px; }
+            .btn-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>AI & 기계학습 시험 대비 대시보드</h1>
+    </header>
+
+    <!-- 1. Start Screen -->
+    <div id="start-screen" class="screen active">
+        <div class="start-card">
+            <h2>학습 모드를 선택하세요</h2>
+            <p style="color: var(--text-muted); margin-top: 8px;">강의자료 기반 34문항 완벽 대비 인터랙티브 시스템</p>
+            <div class="mode-btn-group">
+                <button class="mode-btn" onclick="startApp('study')">
+                    <h3>📚 학습 모드</h3>
+                    <p>개념을 공부하며 문제를 푸는 모드입니다.<br>즉시 채점, 정답 및 상세 해설 보기가 가능합니다.</p>
+                </button>
+                <button class="mode-btn" onclick="startApp('exam')">
+                    <h3>📝 시험 모드</h3>
+                    <p>실제 시험처럼 제한된 환경에서 풀이합니다.<br>모든 문제를 제출한 후 최종 결과를 확인합니다.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Main Quiz Screen -->
+    <div id="quiz-screen" class="screen">
+        <!-- Top Stats Bar -->
+        <div class="dashboard-header">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="label">문제 번호</div>
+                    <div class="value" id="stat-current">1 / 34</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">진행률</div>
+                    <div class="value" id="stat-progress">0%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">정답</div>
+                    <div class="value" id="stat-correct" style="color: var(--success);">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">오답</div>
+                    <div class="value" id="stat-incorrect" style="color: var(--danger);">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">미풀이</div>
+                    <div class="value" id="stat-unanswered">34</div>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- Navigation Matrix -->
+        <div class="nav-matrix" id="nav-matrix"></div>
+
+        <!-- Question Card -->
+        <div class="question-card">
+            <div class="question-title" id="q-title"></div>
+            <ul class="options-list" id="q-options"></ul>
+
+            <!-- Action Buttons -->
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btn-submit" onclick="submitAnswer()">제출하기</button>
+                <button class="btn btn-warning" id="btn-reveal" onclick="revealAnswer()">정답 보기</button>
+                <button class="btn btn-info" id="btn-explain" onclick="toggleExplanation()">해설 보기</button>
+            </div>
+
+            <!-- Feedback Message -->
+            <div id="feedback-message" style="font-weight: bold; font-size: 1.1rem; margin-top: 10px; display: none;"></div>
+
+            <!-- Explanation Box -->
+            <div class="explanation-box" id="explanation-box">
+                <div class="explanation-section">
+                    <span class="explanation-title-tag">[정답]</span>
+                    <div id="exp-answer"></div>
+                </div>
+                <div class="explanation-section">
+                    <span class="explanation-title-tag">[핵심 개념]</span>
+                    <div id="exp-concept"></div>
+                </div>
+                <div class="explanation-section">
+                    <span class="explanation-title-tag">[풀이]</span>
+                    <div id="exp-solution"></div>
+                </div>
+                <div class="explanation-section">
+                    <span class="explanation-title-tag">[왜 이 답인가?]</span>
+                    <div id="exp-why"></div>
+                </div>
+                <div class="explanation-section">
+                    <span class="explanation-title-tag">[시험 포인트]</span>
+                    <div id="exp-point"></div>
+                </div>
+                <div class="explanation-section" id="exp-wrong-container">
+                    <span class="explanation-title-tag">[오답 포인트]</span>
+                    <div id="exp-wrong"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div style="display: flex; justify-content: space-between;">
+            <button class="btn btn-secondary" id="btn-prev" onclick="prevQuestion()">← 이전 문제</button>
+            <button class="btn btn-secondary" id="btn-next" onclick="nextQuestion()">다음 문제 →</button>
+        </div>
+    </div>
+
+    <!-- 3. Result Screen -->
+    <div id="result-screen" class="screen">
+        <div class="result-card">
+            <h2>최종 시험 결과</h2>
+            <div class="result-score" id="res-score">0점</div>
+            <div class="result-stats">
+                <div>정답률: <strong id="res-rate">0%</strong></div>
+                <div>정답: <strong id="res-correct" style="color: var(--success);">0</strong></div>
+                <div>오답: <strong id="res-incorrect" style="color: var(--danger);">0</strong></div>
+                <div>미풀이: <strong id="res-unanswered" style="color: var(--text-muted);">0</strong></div>
+            </div>
+            <div class="btn-group" style="justify-content: center;">
+                <button class="btn btn-primary" onclick="restartApp('all')">🔄 처음부터 다시 풀기</button>
+                <button class="btn btn-warning" onclick="restartApp('wrong')">❌ 틀린 문제 다시 풀기</button>
+                <button class="btn btn-info" onclick="switchToReview()">📖 전체 문제 복습</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 데이터 구조 검증 및 34개 전수 데이터 포함
+const questionsData = [
+    {
+        id: 1,
+        question: "Q1. AI, ML, DL의 관계에 대한 설명으로 옳은 것은?[cite: 1, 3]",
+        options: [
+            "ML은 AI와 DL의 상위 개념이다.[cite: 1]",
+            "AI는 반드시 ML을 사용해야 한다.[cite: 1]",
+            "ML은 AI의 한 부분으로, 데이터로부터 학습을 수행한다.[cite: 1]",
+            "규칙 기반 시스템은 ML의 한 분야이다.[cite: 1]",
+            "ML은 사람이 직접 코딩한 규칙을 그대로 사용하는 방식이다.[cite: 1]"
+        ],
+        answer: 2,
+        concept: "AI(인공지능)는 인지·학습·추론을 수행하는 전체 시스템이며, ML(머신러닝)은 데이터로부터 학습하여 목표를 달성하는 하위 방법론이고, DL(딥러닝)은 ML의 한 종류이다[cite: 1, 3].",
+        solution: "ML은 데이터로부터 규칙을 학습해 목표 달성을 돕는 AI의 한 분야이다[cite: 1]. 규칙 기반 시스템은 코딩된 규칙을 사용하므로 ML이 아니며, AI는 명시적 규칙 기반으로도 구현 가능하다[cite: 1].",
+        why: "보기 ③번이 AI ⊃ ML ⊃ DL의 올바른 포함 관계 및 정의를 정확히 설명하고 있다[cite: 1, 3].",
+        examPoint: "AI와 ML, DL의 포함 관계 (DL ⊂ ML ⊂ AI) 및 규칙 기반 시스템과 ML의 차이점을 명확히 구분할 것[cite: 1].",
+        wrongPoints: "① ML은 AI의 하위 개념[cite: 1]. ② AI는 규칙 기반으로도 가능[cite: 1]. ④ 규칙 기반은 AI의 예시이지 ML이 아님[cite: 1]. ⑤ 사람이 직접 코딩하는 것은 전통적 프로그래밍/규칙 기반임[cite: 1, 3]."
+    },
+    {
+        id: 2,
+        question: "Q2. Feature와 Label에 대한 설명으로 옳지 않은 것은?[cite: 1]",
+        options: [
+            "Feature는 모델이 예측에 사용하는 입력 정보이다.[cite: 1]",
+            "Label은 모델이 예측하려는 정답, 즉 학습의 목표이다.[cite: 1]",
+            "Feature와 Label의 분포와 관계가 학습 결과를 결정한다.[cite: 1]",
+            "Feature는 반드시 수치형 데이터만 될 수 있다.[cite: 1]",
+            "Label은 분류 문제에서는 카테고리, 회귀 문제에서는 수치값이 될 수 있다.[cite: 1]"
+        ],
+        answer: 3,
+        concept: "Feature(특성)는 모델 예측에 사용되는 설명 변수이며, Label(라벨)은 맞추고자 하는 정답이다[cite: 1, 3].",
+        solution: "Feature는 수치형 데이터뿐만 아니라 범주형, 텍스트, 이미지, 음성 등 다양한 형태가 가능하다[cite: 1].",
+        why: "④번의 '반드시 수치형 데이터만 될 수 있다'는 설명은 틀린 설명이다[cite: 1].",
+        examPoint: "Feature의 다양한 데이터 타입 가능성과 분류/회귀에 따른 Label의 형태 차이를 파악할 것[cite: 1].",
+        wrongPoints: "①, ②, ③, ⑤는 모두 Feature와 Label의 올바른 정의 및 특징이다[cite: 1]."
+    },
+    {
+        id: 3,
+        question: "Q3. 미지의 참 함수 f(X)를 학습하는 이유로 적절하지 않은 것은?[cite: 1]",
+        options: [
+            "Feature(X)와 Label(Y) 사이의 관계를 알기 위해[cite: 1]",
+            "모든 데이터의 측정오차(오차)를 제거하기 위해[cite: 1]",
+            "새로운 입력 X에 대해 목표값 Y를 예측하기 위해[cite: 1]",
+            "여러 Feature(X) 중 Label(Y)과 관계를 갖고 있는 Feature를 알기 위해[cite: 1]",
+            "Feature(X) 값의 변화에 따라서 Label(Y)이 어떻게 변화하는지 알기 위해[cite: 1]"
+        ],
+        answer: 1,
+        concept: "데이터는 '참 함수 f(X) + 측정오차'로 구성되며, 모델 학습의 목표는 미지의 참 함수 f(X)를 근사하는 것이다[cite: 1, 3].",
+        solution: "측정 오차(noise)는 관측 기계 한계나 환경 요인 등으로 발생하는 것이므로, f(X)를 잘 학습한다고 해서 데이터 자체에 포함된 측정 오차를 제거할 수는 없다[cite: 1, 3].",
+        why: "학습의 목적은 예측, 중요 특성 파악, 해석 가능성이며 측정오차 자체의 제거는 불가능하다[cite: 1, 3].",
+        examPoint: "학습을 통해 오차를 완벽히 0으로 만들거나 측정 오차 자체를 제거할 수 없다는 점에 유의할 것[cite: 1, 3].",
+        wrongPoints: "①, ③, ④, ⑤는 f(X) 학습의 3대 목적(예측, 중요 특성 파악, 해석 가능성)에 해당하는 올바른 설명이다[cite: 1, 3]."
+    },
+    {
+        id: 4,
+        question: "Q4. 지도학습(Supervised Learning)에 대한 설명으로 옳은 것은?[cite: 1]",
+        options: [
+            "입력 데이터만 있고 정답(라벨)이 없는 데이터로 학습한다.[cite: 1]",
+            "새로운 입력에 대해 정답을 잘 맞추는 함수를 학습한다.[cite: 1]",
+            "오버피팅은 훈련 데이터에서의 오류를 최대한 줄이는 것으로 학습이 목표하는 방향이다.[cite: 1]",
+            "지도학습 모델의 출력은 반드시 범주(카테고리)이다.[cite: 1]",
+            "지도학습은 측정오차를 최소화하는 것이 목적이다.[cite: 1]"
+        ],
+        answer: 1,
+        concept: "지도학습은 입력(Feature)과 정답(Label) 쌍을 이용해 새로운 입력에 대한 정답을 예측하는 규칙을 학습한다[cite: 1, 3].",
+        solution: "지도학습의 궁극적 목표는 처음 보는 데이터에서도 정답을 잘 맞추는 일반화 성능 향상이다[cite: 1, 3].",
+        why: "②번이 지도학습의 목적과 정의를 가장 올바르게 나타내고 있다[cite: 1].",
+        examPoint: "지도학습의 정의(입력+라벨)와 궁극적 목적(일반화 성능 향상, 오버피팅 지양)을 구별할 것[cite: 1, 3].",
+        wrongPoints: "① 라벨 없는 학습은 비지도학습[cite: 1]. ③ 오버피팅은 회피해야 함[cite: 1, 3]. ④ 수치(회귀) 예측도 가능[cite: 1, 3]. ⑤ 측정오차가 아닌 일반화 오류의 최소화가 목적임[cite: 1, 3]."
+    },
+    {
+        id: 5,
+        question: "Q5. 회귀(Regression) 문제의 특징으로 옳은 것은?[cite: 1]",
+        options: [
+            "스팸/정상 분류와 같은 범주 예측 문제를 다룬다.[cite: 1]",
+            "예측값은 연속적인 숫자(예: 가격, 점수, 온도)로 나온다.[cite: 1]",
+            "대표적인 성능 지표는 정확도(Accuracy)이다.[cite: 1]",
+            "예측 결과는 이산적인 값으로 한정된다.[cite: 1]",
+            "훈련 데이터와 테스트 데이터의 분포가 다르면 반드시 발생한다.[cite: 1]"
+        ],
+        answer: 1,
+        concept: "지도학습은 출력 형태에 따라 연속적인 수치를 예측하는 회귀(Regression)와 범주를 예측하는 분류(Classification)로 나뉜다[cite: 1, 3].",
+        solution: "회귀 문제는 연속형 수치(가격, 매출, 온도 등)를 예측하는 것을 목표로 한다[cite: 1, 3].",
+        why: "②번 설명이 회귀의 특징을 올바르게 서술하고 있다[cite: 1].",
+        examPoint: "회귀(연속값, MSE/R² 지표)와 분류(범주값, 정확도/혼동행렬 지표)의 명확한 차이 이해[cite: 1, 3].",
+        wrongPoints: "①, ③, ④는 분류(Classification)에 대한 설명이며, ⑤는 분포 변화(Data Shift)에 관한 독립적인 설명이다[cite: 1, 3]."
+    },
+    {
+        id: 6,
+        question: "Q6. 혼동행렬에 대한 설명으로 옳지 않은 것은?[cite: 1]",
+        options: [
+            "TP(True Positive): 실제 양성을 양성으로 예측한 경우[cite: 1]",
+            "TN(True Negative): 실제 음성을 음성으로 예측한 경우[cite: 1]",
+            "FP(False Positive): 실제 음성인데 양성으로 잘못 예측한 경우[cite: 1]",
+            "FN(False Negative): 실제 양성인데 음성으로 잘못 예측한 경우[cite: 1]",
+            "혼동행렬은 회귀 문제의 성능 평가에서 사용된다.[cite: 1]"
+        ],
+        answer: 4,
+        concept: "혼동행렬(Confusion Matrix)은 분류 문제에서 실제값과 예측값의 조합을 나타내는 2x2 행렬 지표이다[cite: 1, 3].",
+        solution: "혼동행렬은 분류 문제 평가에만 사용된다. 회귀 문제에서는 MSE, RMSE, R² 등의 수치 오차 지표를 사용한다[cite: 1, 3].",
+        why: "⑤번은 분류와 회귀 평가 지표를 혼동한 오답이다[cite: 1, 3].",
+        examPoint: "TP, TN, FP, FN의 정확한 개념과 혼동행렬의 적용 대상(분류) 확인[cite: 1, 3].",
+        wrongPoints: "①, ②, ③, ④는 각각 TP, TN, FP, FN의 정확한 정의이다[cite: 1, 3]."
+    },
+    {
+        id: 7,
+        question: "Q7. 훈련 오류와 테스트 오류에 대한 설명으로 옳은 것은?[cite: 1]",
+        options: [
+            "훈련 오류는 새로운 데이터에 대한 예측 정확도를 측정한다.[cite: 1]",
+            "테스트 오류는 학습에 사용된 데이터에 대해 계산한 평균 오차이다.[cite: 1]",
+            "궁극적으로 테스트 오류를 최소화하는 것이 학습의 목적이다.[cite: 1]",
+            "일반적으로 훈련 오류는 테스트 오류보다 크게 나타난다.[cite: 1]",
+            "훈련 오류는 항상 0에 수렴해야 좋은 모델이다.[cite: 1]"
+        ],
+        answer: 2,
+        concept: "머신러닝은 학습에 안 쓰인 새로운 데이터(테스트 데이터)에서의 성능을 높이는 일반화를 목표로 한다[cite: 1, 3].",
+        solution: "학습의 궁극적 목적은 보지 못한 데이터에서의 오차(테스트 오류)를 최소화하는 일반화 향상이다[cite: 1, 3].",
+        why: "③번이 머신러닝의 참된 학습 목적을 가장 정확히 서술한다[cite: 1, 3].",
+        examPoint: "훈련 오류 vs 테스트 오류의 관계 및 일반화 오류 최소화 개념[cite: 1, 3].",
+        wrongPoints: "① 새로운 데이터 오차는 테스트 오류[cite: 1]. ② 학습 데이터 오차는 훈련 오류[cite: 1]. ④ 일반적으로 훈련 오류 < 테스트 오류[cite: 1]. ⑤ 훈련 오류가 0에 가깝다면 오버피팅 가능성이 큼[cite: 1, 3]."
+    },
+    {
+        id: 8,
+        question: "Q8. 언더피팅과 오버피팅의 특징을 올바르게 설명한 것은?[cite: 1]",
+        options: [
+            "언더피팅은 훈련 오류와 테스트 오류 모두 크게 나타난다.[cite: 1]",
+            "언더피팅은 모델이 지나치게 복잡해 데이터 잡음까지 학습하는 현상이다.[cite: 1]",
+            "오버피팅은 모델이 단순해 중요한 패턴을 놓치는 현상이다.[cite: 1]",
+            "오버피팅은 훈련 오류가 크고 테스트 오류가 작게 나타난다.[cite: 1]",
+            "두 경우 모두 모델 복잡도를 높이면 해결된다.[cite: 1]"
+        ],
+        answer: 0,
+        concept: "언더피팅(Underfitting)은 모델이 지나치게 단순한 상태, 오버피팅(Overfitting)은 지나치게 복잡하여 잡음까지 암기한 상태이다[cite: 1, 3].",
+        solution: "언더피팅 상태에서는 모델의 표현력이 부족하여 훈련 오류와 테스트 오류가 모두 크게 발생한다[cite: 1, 3].",
+        why: "①번 설명이 언더피팅의 핵심 증상을 정확히 서술하고 있다[cite: 1].",
+        examPoint: "언더피팅 vs 오버피팅의 모델 복잡도와 오류 양상 비교[cite: 1, 3].",
+        wrongPoints: "② 오버피팅 설명[cite: 1, 3]. ③ 언더피팅 설명[cite: 1, 3]. ④ 오버피팅은 훈련 오류 작음, 테스트 오류 크음[cite: 1, 3]. ⑤ 오버피팅은 복잡도를 낮춰야 해결됨[cite: 1, 3]."
+    },
+    {
+        id: 9,
+        question: "Q9. K-겹 교차검증(K-fold CV)에 대한 설명으로 옳지 않은 것은?[cite: 1]",
+        options: [
+            "데이터를 K개 그룹(폴드)으로 나누어, 각 그룹을 한 번씩 검증셋으로 사용한다.[cite: 1]",
+            "K번 반복한 후 각 폴드별 평균 오차를 계산해 일반화 성능을 추정한다.[cite: 1]",
+            "K=n일 경우 Leave-One-Out 교차검증(LOOCV)이다.[cite: 1]",
+            "교차검증은 데이터 활용성을 높이면서 테스트 오류에 대한 추정이 가능하다.[cite: 1]",
+            "교차검증 시, 각 폴드에 속한 데이터가 겹쳐도 무방하다.[cite: 1]"
+        ],
+        answer: 4,
+        concept: "K-fold 교차검증은 데이터를 중복 없이 K개의 폴드로 분할하여 평가하는 분산 감소형 추정 기법이다[cite: 1, 3].",
+        solution: "각 폴드는 서로 상호 배타적(overlapping이 없음)이어야 하며, 데이터가 겹치면 데이터 누출 및 정확한 평가 불가가 발생한다[cite: 1].",
+        why: "⑤번의 '겹쳐도 무방하다'는 설명은 교차검증의 원칙에 완전히 어긋난다[cite: 1].",
+        examPoint: "K-fold CV의 분할 원칙(비중복)과 LOOCV(K=n)의 특수 형태 기억[cite: 1]."
+    },
+    {
+        id: 10,
+        question: "Q10. 다음 중 비지도 학습의 예로 해당하는 것은?[cite: 1]",
+        options: [
+            "스팸/이메일 분류[cite: 1]",
+            "집값 변화 예측[cite: 1]",
+            "(라벨이 없는 데이터에서) 구매 성향별 고객 묶음[cite: 1]",
+            "주간 날씨 예측[cite: 1]"
+        ],
+        answer: 2,
+        concept: "비지도 학습(Unsupervised Learning)은 정답(Label)이 없는 데이터에서 숨겨진 구조나 군집(Clustering)을 찾아내는 방법이다[cite: 1, 3].",
+        solution: "구매 성향별 고객 묶음(클러스터링)은 라벨이 주어지지 않은 상태에서 패턴을 그룹화하므로 전형적인 비지도 학습이다[cite: 1].",
+        why: "보기 C만 정답 라벨이 없는 클러스터링 기반 비지도 학습에 해당한다[cite: 1].",
+        examPoint: "지도학습(분류/회귀)과 비지도학습(군집화/군집 분석)의 사례 구분[cite: 1]."
+    },
+    {
+        id: 11,
+        question: "Q11. K-means와 계층적 군집의 특징 연결로 올바른 것은?[cite: 1]\n\nA. 클러스터 수 K를 미리 지정해야 한다.[cite: 1]\nB. 덴드로그램(Dendrogram)을 제공한다.[cite: 1]\nC. 데이터 간 병합(상향식) 과정을 거친다.[cite: 1]\nD. 클러스터 내부 변동 합을 최소화한다.[cite: 1]\nE. 대규모 데이터셋에 효율적이다.[cite: 1]",
+        options: [
+            "K-means: A, D, E / 계층적 군집: B, C[cite: 1]",
+            "K-means: B, C / 계층적 군집: A, D, E[cite: 1]",
+            "K-means: A, B / 계층적 군집: C, D, E[cite: 1]",
+            "K-means: C, D / 계층적 군집: A, B, E[cite: 1]"
+        ],
+        answer: 0,
+        concept: "비지도 군집화 중 K-means는 분할적 방법이고, 계층적 군집(Hierarchical Clustering)은 트리 기반 상향/하향식 방법이다[cite: 1].",
+        solution: "K-means는 K 지정 필수, 군집 내 변산 최소화, 대용량 계산 효율성(A, D, E)을 가진다. 계층적 군집은 덴드로그램 시각화 및 병합형 구조(B, C)를 특징으로 한다[cite: 1].",
+        why: "A, D, E는 K-means, B, C는 계층적 군집의 올바른 속성이다[cite: 1].",
+        examPoint: "K-means(K사전설정, 효율적)와 계층적 군집(덴드로그램, 병합 방식)의 핵심 차이 수지[cite: 1]."
+    },
+    {
+        id: 12,
+        question: "Q12. 단순선형회귀에 대한 설명 중 가장 올바르지 않은 것은?[cite: 2]",
+        options: [
+            "선형회귀의 목적은 입력과 출력 간의 선형 관계를 찾아 예측 및 해석을 수행하는 것이다.[cite: 2]",
+            "단순선형회귀 모형은 Y = β0 + β1*X + ε 형태이며 β0는 절편, β1은 기울기이다.[cite: 2]",
+            "잔차(Residual)는 관측값과 예측값의 차이(e = y - y_hat)를 의미한다.[cite: 2]",
+            "최소제곱법은 잔차의 절댓값 합을 최소화하여 계수를 구하는 방식이다.[cite: 2]"
+        ],
+        answer: 3,
+        concept: "단순선형회귀(Simple Linear Regression)는 단일 변수 X와 Y 간의 선형 관계를 최소제곱법(Least Squares)으로 모델링한다[cite: 2, 4].",
+        solution: "최소제곱법(Least Squares)은 잔차의 절댓값 합이 아닌 '잔차제곱합(RSS; Residual Sum of Squares)'을 최소화하는 계수를 구한다[cite: 2, 4].",
+        why: "④번의 '절댓값 합' 설명은 최소절댓값법(LAD)에 해당하며, 최소제곱법은 '제곱합'을 최소화한다[cite: 2, 4].",
+        examPoint: "잔차제곱합(RSS) 최소화 공식 및 회귀계수(절편 β0, 기울기 β1)의 직관적 해석[cite: 2, 4]."
+    },
+    {
+        id: 13,
+        question: "Q13. 다중선형회귀 분석에 대한 설명으로 옳지 않은 것은?[cite: 2]",
+        options: [
+            "여러 설명변수를 활용하여 종속변수를 예측하는 모델이다.[cite: 2]",
+            "설명변수를 계속 추가하면 언제나 오버피팅 위험 없이 예측력만 대폭 향상된다.[cite: 2]",
+            "다중공선성이 발생하면 회귀계수의 분산이 커져 추정이 불안정해진다.[cite: 2]",
+            "대표적인 모델 성능 평가 지표로 결정계수(R²)와 잔차표준오차(RSE)가 있다.[cite: 2]"
+        ],
+        answer: 1,
+        concept: "다중선형회귀(Multiple Linear Regression)는 p개의 설명변수를 동시 고려하는 회귀 기법이다[cite: 2, 4].",
+        solution: "불필요한 설명변수를 지나치게 많이 추가하면 모델이 복잡해져 과적합(Overfitting) 위험이 심화되고 해석이 불명확해진다[cite: 2, 4].",
+        why: "②번의 '오버피팅 위험이 없다'는 서술은 명백한 오답이다[cite: 2, 4].",
+        examPoint: "변수 추가 시의 장단점(설명력 증대 vs 과적합/다중공선성 위험) 파악[cite: 2, 4]."
+    },
+    {
+        id: 14,
+        question: "Q14. 범주형 변수의 코딩 및 회귀 모델 적용에 대한 설명 중 틀린 것은?[cite: 2]",
+        options: [
+            "다중범주 문제에는 선형회귀보다 Multiclass Logistic Regression 등이 적절하다.[cite: 2]",
+            "선형회귀 예측값을 확률로 해석하면 0 미만이나 1 초과가 나올 수 있다.[cite: 2]",
+            "기상 상태(맑음, 눈, 비)를 1, 2, 3으로 정수 코딩하여 선형회귀에 사용하는 것이 가장 바람직하다.[cite: 2]",
+            "범주형(질적) 변수는 순서가 없는 집합 형태의 값을 가진다.[cite: 2]"
+        ],
+        answer: 2,
+        concept: "범주형 변수에 인위적인 정수(1, 2, 3)를 부여하면 순서 및 범주 간 동일 거리 가정이 암묵적으로 반영되어 오류를 초래한다[cite: 2, 4].",
+        solution: "범주형 데이터를 인위적 정수로 정렬 코딩하면 부적절한 직관과 오차를 유발하므로 더미변수 변환이나 로지스틱 회귀를 써야 한다[cite: 2, 4].",
+        why: "③번은 범주형 변수의 부적절한 변환 방식을 권장하므로 틀린 설명이다[cite: 2, 4].",
+        examPoint: "범주형 변수 정수 코딩의 한계점과 로지스틱 회귀의 필요성 연결[cite: 2, 4]."
+    },
+    {
+        id: 15,
+        question: "Q15. 로지스틱 함수(Sigmoid Function)의 출력 범위로 올바른 것은?[cite: 2]",
+        options: [
+            "[0, 1] (0과 1을 포함)",
+            "(0, 1) (0과 1을 미포함)",
+            "(-무한대, +무한대)",
+            "{0, 1} (0 또는 1의 이산값)"
+        ],
+        answer: 1,
+        concept: "로지스틱 함수 y = 1 / (1 + e^(-z))는 어떤 실수 z가 입력되어도 (0, 1) 사이의 연속 확률값을 반환한다[cite: 2, 4].",
+        solution: "로지스틱 함수 출력은 0과 1에 무한히 수렴할 뿐 직접 도달하지 않으므로 열린구간 (0, 1)이 정확한 출력 범위이다[cite: 2, 4].",
+        why: "끝점 0과 1은 극한값으로만 도달하므로 닫힌구간 [0,1]이 아닌 열린구간 (0, 1)이 정답이다[cite: 2, 4].",
+        examPoint: "시그모이드 함수의 정확한 치역 범위 (0, 1) 숙지[cite: 2, 4]."
+    },
+    {
+        id: 16,
+        question: "Q16. 로지스틱 회귀에서 가중치(모수)를 추정할 때 사용하는 표준 평가 지표는 MSE(평균제곱오차)이다. (O/X)[cite: 2]",
+        options: [
+            "O (맞음)[cite: 2]",
+            "X (틀림)[cite: 2]"
+        ],
+        answer: 1,
+        concept: "로지스틱 회귀에서는 확률 모델의 데이터 적합도를 평가하기 위해 우도(Likelihood) 개념을 활용한다[cite: 2, 4].",
+        solution: "로지스틱 회귀의 모수 추정 지표는 MSE가 아닌 우도(Likelihood)를 최대화하는 최대우도추정법(MLE)을 사용한다[cite: 2, 4].",
+        why: "MSE는 선형 회귀의 손실지표이며, 로지스틱 회귀는 MLE(최대우도추정법)를 이용한다[cite: 2, 4].",
+        examPoint: "선형 회귀(MSE, 최소제곱법) vs 로지스틱 회귀(Likelihood, MLE)의 모수 추정 방식 대비[cite: 2, 4]."
+    },
+    {
+        id: 17,
+        question: "Q17. 경사 하강법(Gradient Descent) 및 손실함수에 대한 설명으로 옳은 것은?[cite: 2]",
+        options: [
+            "손실함수는 모델 파라미터를 무작위로 섞는 역할을 한다.[cite: 2]",
+            "경사 하강법 Step 1은 파라미터 기울기(미분값)를 계산하는 과정이다.[cite: 2]",
+            "확률적 경사 하강법(SGD)은 일부 데이터(미니배치)만 사용하여 연산 비용이 작다.[cite: 2]",
+            "Convex(볼록) 문제의 2차 미분값은 모든 구간에서 음수이다.[cite: 2]"
+        ],
+        answer: 2,
+        concept: "경사 하강법은 손실함수의 기울기를 따라 최적 모수를 찾아가는 알고리즘이다[cite: 2, 4].",
+        solution: "SGD는 전체 데이터(Full-batch)가 아닌 미니배치를 무작위 추출하여 기울기를 계산하므로 스텝당 계산 부담이 매우 적다[cite: 2, 4].",
+        why: "③번이 SGD의 가장 핵심적인 연산 효율성 장점을 올바르게 서술하고 있다[cite: 2, 4].",
+        examPoint: "Full-batch GD vs SGD의 차이점 및 SGD의 연산 비용 절감/국소 최솟값 탈출 원리[cite: 2, 4].",
+        wrongPoints: "① 손실함수는 예측 오차 측정[cite: 2, 4]. ② Step 1은 무작위 초기화[cite: 2]. ④ Convex 문제의 2차 미분은 항상 양수(0 이상)이다[cite: 2]."
+    },
+    {
+        id: 18,
+        question: "Q18. 신경망 활성화 함수(Activation Function) 및 전처리에 관한 서술 중 옳지 않은 것은?[cite: 2]",
+        options: [
+            "좋은 모델 구조라도 초기화나 학습률 설정이 잘못되면 학습에 실패할 수 있다.[cite: 2]",
+            "Sigmoid 함수는 양극단에서 기울기가 0으로 수렴해 기울기 소실(Vanishing Gradient) 문제가 생긴다.[cite: 2]",
+            "Leaky ReLU는 음수 영역에서도 작은 기울기를 유지하여 dying ReLU 문제를 완화한다.[cite: 2]",
+            "ReLU 함수는 음수 입력값에 대해 항상 1의 출력을 내보낸다.[cite: 2]"
+        ],
+        answer: 3,
+        concept: "활성화 함수는 신경망에 비선형성을 부여하는 핵심 요소이다[cite: 2, 4].",
+        solution: "ReLU 함수는 입력 z < 0 일 때 출력값이 항상 0이며, z >= 0 일 때 z 그대로를 출력한다[cite: 2, 4].",
+        why: "④번의 '음수 입력 시 항상 1의 출력'이라는 문장은 ReLU의 기본식 max(0, z)에 위배된다[cite: 2, 4].",
+        examPoint: "Sigmoid(기울기 소실), ReLU(0 이하 차단), Leaky ReLU(음수 영역 소량 허용)의 동작 특성 비교[cite: 2, 4]."
+    },
+    {
+        id: 19,
+        question: "Q19. 드롭아웃(Dropout) 및 하이퍼파라미터 탐색 전략 설명으로 옳은 것은?[cite: 2]",
+        options: [
+            "드롭아웃 적용 시 학습 과정과 테스트 과정의 노드 출력을 동일하게 유지해야 한다.[cite: 2]",
+            "학습률선정 기본 전략은 초반에 큰 학습률로 빠르게 탐색 후 점차 감소시키는 것이다.[cite: 2]",
+            "그리드 탐색은 무작위로 하이퍼파라미터 조합을 샘플링하는 기법이다.[cite: 2]",
+            "랜덤 탐색은 지정된 격자상의 모든 하이퍼파라미터 조합을 전수 조사한다.[cite: 2]"
+        ],
+        answer: 1,
+        concept: "학습율 스케줄링은 학습 속도와 안정적인 수렴을 동시에 달성하기 위한 하이퍼파라미터 제어 기법이다[cite: 2, 4].",
+        solution: "학습 초기에는 큰 step size로 대역을 탐색하고, 후반에는 step size(학습률)를 줄여 최솟값으로 안착시킨다[cite: 2, 4].",
+        why: "②번 서술이 학습률 Decay 및 설정 전략에 부합하는 정답이다[cite: 2, 4].",
+        examPoint: "학습률 탐색 전략과 그리드 탐색(전수 격자) vs 랜덤 탐색(무작위 추출) 개념의 상호 반대 관계 점검[cite: 2, 4].",
+        wrongPoints: "① 드롭아웃은 평가 시 전체 노드 활용[cite: 2, 4]. ③, ④는 그리드 탐색과 랜덤 탐색의 정의가 서로 뒤바뀜[cite: 2, 4]."
+    },
+    {
+        id: 20,
+        question: "Q20. 문제 36. AI, ML, DL의 포함 관계 설명으로 옳은 것을 고르시오. (A ⊂ B : A가 B에 포함됨)[cite: 1]",
+        options: [
+            "DL ⊂ AI ⊂ ML[cite: 1]",
+            "AI ⊂ ML ⊂ DL[cite: 1]",
+            "ML ⊂ DL ⊂ AI[cite: 1]",
+            "DL ⊂ ML ⊂ AI[cite: 1]"
+        ],
+        answer: 3,
+        concept: "인공지능(AI)이라는 거대한 범주 안에 머신러닝(ML)이 포함되고, 머신러닝 안에 딥러닝(DL)이 속한다[cite: 1, 3].",
+        solution: "가장 좁은 범위인 DL이 ML에 속하고, ML이 가장 넓은 AI에 속하므로 DL ⊂ ML ⊂ AI 가 성립한다[cite: 1, 3].",
+        why: "④번 관계식이 세 개념의 계층적 벤다이어그램 구조를 올바르게 표기하고 있다[cite: 1, 3].",
+        examPoint: "AI, ML, DL의 최외곽-중간-내부 계층 관계 표기 숙지[cite: 1, 3]."
+    },
+    {
+        id: 21,
+        question: "Q21. 문제 50. 다음 중 Feature와 Label에 대한 설명으로 옳지 않은 것을 고르시오.[cite: 1]",
+        options: [
+            "Feature는 입력 설명 변수이다.[cite: 1]",
+            "Label은 예측 대상(정답)이다.[cite: 1]",
+            "Feature는 오직 수치형만 가능하다.[cite: 1]",
+            "Feature - Label의 분포와 관계가 성능에 영향을 준다.[cite: 1]"
+        ],
+        answer: 2,
+        concept: "Feature는 모델의 입력 데이터이며 범주, 수치, 이미지, 텍스트 등 여러 형태를 지닌다[cite: 1, 3].",
+        solution: "Feature는 수치형 데이터뿐 아니라 문자열, 범주형 등 형태의 제약이 없다[cite: 1, 3].",
+        why: "③번의 '오직 수치형만 가능' 서술은 잘못되었다[cite: 1, 3].",
+        examPoint: "Feature 데이터 타입의 다양성 기억[cite: 1, 3]."
+    },
+    {
+        id: 22,
+        question: "Q22. 문제 48. 다음 중 분류 문제의 예로 옳은 것은?[cite: 1]",
+        options: [
+            "월매출 예측[cite: 1]",
+            "온도 예측[cite: 1]",
+            "집값 예측[cite: 1]",
+            "이메일 스팸/정상 판별[cite: 1]"
+        ],
+        answer: 3,
+        concept: "분류(Classification)는 이산적인 범주(Category) 라벨을 예측하는 지도학습 유형이다[cite: 1, 3].",
+        solution: "이메일을 스팸(Spam) 혹은 정상(Ham)이라는 두 범주 중 하나로 판별하는 것이 이진 분류의 대표 사례이다[cite: 1, 3].",
+        why: "④번만 범주형 라벨을 다루며, 1, 2, 3은 모두 연속 수치를 예측하는 회귀 문제이다[cite: 1, 3].",
+        examPoint: "분류 문제(이메일 판별, 질병 유무)와 회귀 문제(매출, 온도, 집값) 구분[cite: 1, 3]."
+    },
+    {
+        id: 23,
+        question: "Q23. 문제 6. 오버피팅과 분포 변화(Data Shift)의 개념으로 옳은 설명을 고르시오.[cite: 1]",
+        options: [
+            "오버피팅은 훈련·테스트 분포가 달라서만 발생한다.[cite: 1]",
+            "분포 변화로 오류가 늘 수 있으나, 이는 오버피팅과 별개의 개념이다.[cite: 1]",
+            "분포 변화가 없으면 오버피팅은 불가능하다.[cite: 1]",
+            "오버피팅은 테스트 성능이 높을 때 나타난다.[cite: 1]"
+        ],
+        answer: 1,
+        concept: "오버피팅은 모델의 과도한 복잡도로 발생하며, Data Shift는 훈련과 테스트 데이터의 분포 자체가 바뀌어 발생하는 현상이다[cite: 1, 3].",
+        solution: "Data Shift에 의해 오차가 증가할 수 있지만 이는 동일 분포 하에서 과도 학습으로 발생하는 오버피팅과는 엄연히 별개의 원인이다[cite: 1, 3].",
+        why: "②번이 오버피팅과 Data Shift의 독립적 관계를 바르게 설명한다[cite: 1, 3].",
+        examPoint: "오버피팅 원인(모델 과복잡)과 Data Shift(분포 차이)의 상호 독립성 분류[cite: 1, 3]."
+    },
+    {
+        id: 24,
+        question: "Q24. 문제 4. K-fold 교차검증의 주된 목적은?[cite: 1]",
+        options: [
+            "훈련 오차 최소화[cite: 1]",
+            "테스트 데이터 누출 방지[cite: 1]",
+            "일반화 성능 추정의 분산을 줄이며 편향을 완화[cite: 1]",
+            "파라미터 수를 줄여 모델 단순화[cite: 1]"
+        ],
+        answer: 2,
+        concept: "교차검증은 데이터를 여러 조각으로 나눔으로써 단일 분할 평가에 따른 편향과 분산을 줄이는 추정법이다[cite: 1, 3].",
+        solution: "K-fold 교차검증은 데이터 전반을 검증에 활용하여 일반화 성능 추정치 분산 및 편향을 효과적으로 줄인다[cite: 1, 3].",
+        why: "③번이 교차검증 도입의 핵심 통계적 목적을 정확히 명시하고 있다[cite: 1, 3].",
+        examPoint: "K-fold 교차검증의 목적: 평가 분산 감소 및 일반화 성능의 안정적 추정[cite: 1, 3]."
+    },
+    {
+        id: 25,
+        question: "Q25. 문제 14. 다음 중 혼동행렬에 대한 설명으로 틀린 것을 고르시오.[cite: 1]",
+        options: [
+            "True Positive (TP): 실제 양성·예측 양성[cite: 1]",
+            "True Negative (TN): 실제 음성·예측 음성[cite: 1]",
+            "False Positive (FP): 실제 양성인데 음성으로 예측[cite: 1]",
+            "False Negative (FN): 실제 양성인데 음성으로 예측[cite: 1]"
+        ],
+        answer: 2,
+        concept: "False Positive(FP)는 'False(잘못된) + Positive(양성 예측)', 즉 실제 음성을 양성으로 잘못 예측한 오탐을 의미한다[cite: 1, 3].",
+        solution: "③번에서 FP를 '실제 양성인데 음성으로 예측'이라고 설명한 것은 FN(False Negative)에 대한 서술이므로 잘못되었다[cite: 1, 3].",
+        why: "FP는 실제 음성 -> 예측 양성인 상황이다[cite: 1, 3].",
+        examPoint: "FP(실제 음성->예측 양성) vs FN(실제 양성->예측 음성)의 명확한 지점 파악[cite: 1, 3]."
+    },
+    {
+        id: 26,
+        question: "Q26. 문제 26. 이진 분류에서 정밀도(Precision)를 수식으로 잘 나타낸 것을 고르시오.[cite: 1]",
+        options: [
+            "TP / (TP + FP)[cite: 1]",
+            "TP / (TP + FN)[cite: 1]",
+            "FP / (TP + FP)[cite: 1]",
+            "FN / (TP + FN)[cite: 1]"
+        ],
+        answer: 0,
+        concept: "정밀도(Precision)는 모델이 양성이라고 예측한 전체 검출 건수 중 실제 양성인 비율이다[cite: 1, 3].",
+        solution: "정밀도 수식 = TP / (TP + FP) 이다[cite: 1, 3]. (참고: 재현율 Recall = TP / (TP + FN))[cite: 1, 3]",
+        why: "①번 수식이 정밀도(Precision)의 수학적 공식이다[cite: 1, 3].",
+        examPoint: "Precision = TP / (TP + FP) 및 Recall = TP / (TP + FN) 분모 비교[cite: 1, 3]."
+    },
+    {
+        id: 27,
+        question: "Q27. 문제 66. 다음 중 회귀 문제로 가장 적절한 것은?[cite: 1]",
+        options: [
+            "이메일이 스팸인지 정상인지 예측[cite: 1]",
+            "종양이 양성인지 악성인지 예측[cite: 1]",
+            "아파트 매매가 예측[cite: 1]",
+            "고객이 이탈할지 여부 분류[cite: 1]"
+        ],
+        answer: 2,
+        concept: "회귀(Regression)는 수치적인 연속값을 예측 목표로 삼는 지도학습이다[cite: 1, 3].",
+        solution: "아파트 매매가는 연속적인 금액 수치이므로 회귀 문제에 해당한다[cite: 1, 3].",
+        why: "③번을 제외한 1, 2, 4번은 모두 이진 분류 문제이다[cite: 1, 3].",
+        examPoint: "연속형 금액/가격 예측 = 회귀 문제[cite: 1, 3]."
+    },
+    {
+        id: 28,
+        question: "Q28. 문제 40. 다음 중 RSS(잔차제곱합)의 정의에 대한 올바른 설명을 고르시오.[cite: 2]",
+        options: [
+            "예측값들의 평균[cite: 2]",
+            "관측오차의 합[cite: 2]",
+            "잔차 제곱의 합[cite: 2]",
+            "표본분산[cite: 2]"
+        ],
+        answer: 2,
+        concept: "RSS(Residual Sum of Squares)는 관측값과 회귀 예측값의 차이인 잔차(e_i)들을 제곱하여 합한 값이다[cite: 2, 4].",
+        solution: "RSS = e1^2 + e2^2 + ... + en^2 의 형태로 계산되며 최소제곱법의 최적화 대상이다[cite: 2, 4].",
+        why: "③번이 RSS의 정의를 글자 그대로 바르게 설명한다[cite: 2, 4].",
+        examPoint: "RSS(잔차 제곱의 합) 수식 구조와 최소제곱법의 관계[cite: 2, 4]."
+    },
+    {
+        id: 29,
+        question: "Q29. 문제 23. 다음 중 결정계수 R²에 대한 옳은 설명을 고르시오.[cite: 2]",
+        options: [
+            "값이 0보다 작아질 수 없는 지표이다.[cite: 2]",
+            "평균 예측보다 나쁠수록 값이 1에 가까워진다.[cite: 2]",
+            "0~1 구간을 벗어날 수 있다.[cite: 2]",
+            "값이 클수록 항상 과적합이다.[cite: 2]"
+        ],
+        answer: 2,
+        concept: "결정계수 R² = 1 - (RSS / TSS) 로 정의되며 모델이 평균선 대비 얼마나 설명력이 있는지를 나타낸다[cite: 2, 3].",
+        solution: "모델이 단순 평균값으로 예측하는 것보다 성능이 더 떨어지면 RSS > TSS가 되어 R² 값이 음수(< 0)가 될 수 있으므로 0~1 구간을 벗어날 수 있다[cite: 2, 3].",
+        why: "R²은 0~1 사이가 일반적이나, 엉망인 모델의 경우 음수가 나올 수 있어 0~1 구간을 벗어난다[cite: 2, 3].",
+        examPoint: "R²이 음수(< 0)가 나올 수 있는 조건(평균보다 못한 예측) 숙지[cite: 2, 3]."
+    },
+    {
+        id: 30,
+        question: "Q30. 문제 24. 다음 중 올바른 것을 모두 고르시오.[cite: 2]\n\nㄱ. 상관이 높아도 인과관계가 아닐 수 있다.[cite: 2]\nㄴ. 설명변수 간 상관이 클수록 계수 추정 분산이 커질 수 있다.[cite: 2]\nㄷ. 다중공선성이 심하면 p-value가 항상 과소추정된다.[cite: 2]",
+        options: [
+            "ㄱ[cite: 2]",
+            "ㄱ, ㄴ[cite: 2]",
+            "ㄴ, ㄷ[cite: 2]",
+            "ㄱ, ㄴ, ㄷ[cite: 2]"
+        ],
+        answer: 1,
+        concept: "상관관계와 인과관계의 구별, 그리고 다중공선성(Multicollinearity)에 따른 회귀계수 표준오차 상승 효과[cite: 2, 4].",
+        solution: "ㄱ: 상관관계와 인과성은 별개임(옳음)[cite: 2, 4]. ㄴ: 다중공선성이 높으면 계수 추정 분산이 커짐(옳음)[cite: 2, 4]. ㄷ: 다중공선성은 표준오차를 튀게 만들어 p-value를 과대추정(유의하지 않게 만듦)시킴(틀림)[cite: 2, 4].",
+        why: "ㄱ과 ㄴ만 옳으므로 ②번이 정답이다[cite: 2, 4].",
+        examPoint: "다중공선성 영향: 분산 증가, 표준오차 확대, p-value 과대추정(검정력 저하)[cite: 2, 4]."
+    },
+    {
+        id: 31,
+        question: "Q31. 문제 13. 다음 중 신경망에 대한 설명으로 옳지 않은 것을 고르시오.[cite: 2]",
+        options: [
+            "Deep 네트워크는 shallow 네트워크를 여러개(복수)로 합성하는 것으로 생각할 수 있다.[cite: 2]",
+            "네트워크의 깊이를 늘리면 어떤 함수들에 대해서는 필요한 유닛 수 및 파라미터가 감소할 수 있다.[cite: 2]",
+            "깊이를 늘리면 항상 훈련이 쉬워지고 최적화가 안정해진다.[cite: 2]",
+            "Deep 네트워크에서 파라미터 업데이트는 여러층에서의 미분값의 곱이 관여한다.[cite: 2]"
+        ],
+        answer: 2,
+        concept: "신경망의 깊이(Depth) 증가에 따른 표현력 상승과 최적화 난이도의 트레이드오프[cite: 2, 4].",
+        solution: "네트워크 깊이를 늘리면 표현 효율성은 높아지지만, 기울기 소실/폭발 현상이 생겨 최적화 및 훈련이 훨씬 어려워질 수 있다[cite: 2, 4].",
+        why: "③번의 '항상 훈련이 쉬워지고 최적화가 안정된다'는 서술은 거짓이다[cite: 2, 4].",
+        examPoint: "깊은 신경망(Deep Net)의 표현력 장점 vs 기울기 소실 등 최적화 난이도 증가 위험[cite: 2, 4]."
+    },
+    {
+        id: 32,
+        question: "Q32. 문제 28. 다음 중 확률적 경사하강법(SGD)의 장점으로 옳지 않은 것을 고르시오.[cite: 2]",
+        options: [
+            "미니배치를 사용해 스텝당 연산량이 작다.[cite: 2]",
+            "노이즈가 있어 local minima를 빠져나오는데 유리할 수 있다.[cite: 2]",
+            "항상 full-batch GD보다 빠르게 수렴한다.[cite: 2]",
+            "대규모 데이터에서 효율적이다.[cite: 2]"
+        ],
+        answer: 2,
+        concept: "SGD(Stochastic Gradient Descent)는 무작위 미니배치를 사용하는 매개변수 최적화 기법이다[cite: 2, 4].",
+        solution: "SGD는 미니배치 노이즈로 인해 Convex(볼록)에 가까운 환경에서는 오히려 배치 경사하강법(Full-batch GD)보다 수렴 속도가 느릴 수 있다[cite: 2, 4].",
+        why: "③번의 '항상 빠르게 수렴한다'는 서술은 오답이다[cite: 2, 4].",
+        examPoint: "SGD의 스텝당 연산 효율성 및 Local Minima 탈출 특성 vs 수렴 진동 가능성[cite: 2, 4]."
+    },
+    {
+        id: 33,
+        question: "Q33. 문제 61. 다음 중 이진 분류 문제에서 선형회귀보다 로지스틱 회귀를 쓰는 이유로 가장 적절한 것을 고르시오.[cite: 2]",
+        options: [
+            "계산이 항상 더 빠르기 때문이다.[cite: 2]",
+            "예측값을 0과 1 사이의 확률로 해석할 수 있기 때문이다.[cite: 2]",
+            "범주 수가 많을수록 정확하기 때문이다.[cite: 2]",
+            "p-value를 계산할 수 없기 때문이다.[cite: 2]"
+        ],
+        answer: 1,
+        concept: "선형회귀 출력은 (-무한대, +무한대) 범위를 가져 확률 해석이 불가능하나 로지스틱 회귀는 시그모이드를 거쳐 (0, 1) 확률값을 보장한다[cite: 2, 4].",
+        solution: "로지스틱 회귀는 출력이 항상 (0, 1)로 사상되어 입력 조건에 따른 사건 발생 확률로 직접 해석 가능하다[cite: 2, 4].",
+        why: "②번 설명이 로지스틱 회귀 채택의 결정적인 이유다[cite: 2, 4].",
+        examPoint: "선형회귀의 범위 이탈 한계 (-무한대 ~ +무한대) vs 로지스틱의 (0, 1) 확률 매핑[cite: 2, 4]."
+    },
+    {
+        id: 34,
+        question: "Q34. 문제 62. 다음 중 손실함수(Loss Function)의 역할로 가장 알맞은 것을 고르시오.[cite: 2]",
+        options: [
+            "입력 데이터를 무작위로 섞는다.[cite: 2]",
+            "모델의 예측이 얼마나 잘못되었는지 측정한다.[cite: 2]",
+            "파라미터를 업데이트하는 규칙을 제공한다.[cite: 2]",
+            "학습률(learning rate)을 설정한다.[cite: 2]"
+        ],
+        answer: 1,
+        concept: "손실함수(Loss Function)는 정답 Label과 모델 예측값 간의 오차 크기를 단일 수치 지표로 정량 측정한다[cite: 1, 2, 3, 4].",
+        solution: "손실함수는 예측 실패 정도를 정량 측정하며, 가중치 업데이트 규칙 자체는 옵티마이저(경사하강법)의 역할이다[cite: 2, 4].",
+        why: "②번이 손실함수의 유일하고 바른 역할 정의이다[cite: 2, 4].",
+        examPoint: "손실함수의 역할(오차 측정)과 옵티마이저의 역할(파라미터 업데이트) 구분[cite: 2, 4]."
+    }
+];
+
+// App State Management
+let appState = {
+    mode: 'study', // 'study' | 'exam'
+    currentIndex: 0,
+    userAnswers: new Array(questionsData.length).fill(null), // { selected: number, status: 'correct'|'incorrect'|'revealed' }
+};
+
+// DOM References
+const screens = {
+    start: document.getElementById('start-screen'),
+    quiz: document.getElementById('quiz-screen'),
+    result: document.getElementById('result-screen')
+};
+
+function showScreen(screenKey) {
+    Object.keys(screens).forEach(key => {
+        screens[key].classList.remove('active');
+    });
+    screens[screenKey].classList.add('active');
+}
+
+function startApp(mode) {
+    appState.mode = mode;
+    appState.currentIndex = 0;
+    appState.userAnswers = new Array(questionsData.length).fill(null);
+    showScreen('quiz');
+    renderQuiz();
+}
+
+function renderQuiz() {
+    const q = questionsData[appState.currentIndex];
+    const userAns = appState.userAnswers[appState.currentIndex];
+
+    // Update Header Stats
+    document.getElementById('stat-current').innerText = `${q.id} / ${questionsData.length}`;
+    
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let answeredCount = 0;
+
+    appState.userAnswers.forEach(ans => {
+        if (ans) {
+            answeredCount++;
+            if (ans.status === 'correct') correctCount++;
+            if (ans.status === 'incorrect') incorrectCount++;
+        }
+    });
+
+    const progressPercent = Math.round((answeredCount / questionsData.length) * 100);
+    document.getElementById('stat-progress').innerText = `${progressPercent}%`;
+    document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+    document.getElementById('stat-correct').innerText = correctCount;
+    document.getElementById('stat-incorrect').innerText = incorrectCount;
+    document.getElementById('stat-unanswered').innerText = questionsData.length - answeredCount;
+
+    // Render Matrix Nav
+    const navMatrix = document.getElementById('nav-matrix');
+    navMatrix.innerHTML = '';
+    questionsData.forEach((item, idx) => {
+        const navBtn = document.createElement('div');
+        navBtn.className = 'nav-item';
+        if (idx === appState.currentIndex) navBtn.classList.add('active');
+        
+        const ans = appState.userAnswers[idx];
+        if (ans) {
+            navBtn.classList.add(ans.status);
+        } else {
+            navBtn.classList.add('unanswered');
+        }
+        navBtn.innerText = item.id;
+        navBtn.onclick = () => {
+            appState.currentIndex = idx;
+            renderQuiz();
+        };
+        navMatrix.appendChild(navBtn);
+    });
+
+    // Render Question Title
+    document.getElementById('q-title').innerText = `${q.id}. ${q.question}`;
+
+    // Render Options
+    const optionsContainer = document.getElementById('q-options');
+    optionsContainer.innerHTML = '';
+    
+    q.options.forEach((optText, optIdx) => {
+        const li = document.createElement('li');
+        li.className = 'option-item';
+        
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'quiz-option';
+        radio.value = optIdx;
+        radio.id = `opt-${optIdx}`;
+
+        if (userAns && userAns.selected === optIdx) {
+            radio.checked = true;
+        }
+
+        const label = document.createElement('label');
+        label.htmlFor = `opt-${optIdx}`;
+        label.style.width = '100%';
+        label.style.cursor = 'pointer';
+        label.innerText = optText;
+
+        li.appendChild(radio);
+        li.appendChild(label);
+
+        // Feedback Styles if submitted or revealed
+        if (userAns) {
+            radio.disabled = true;
+            if (optIdx === q.answer) {
+                li.classList.add('correct-bg');
+                const badge = document.createElement('span');
+                badge.className = 'feedback-badge';
+                badge.innerText = '✓ 정답';
+                li.appendChild(badge);
+            }
+            if (userAns.selected === optIdx && userAns.selected !== q.answer) {
+                li.classList.add('incorrect-bg');
+                const badge = document.createElement('span');
+                badge.className = 'feedback-badge';
+                badge.innerText = '✗ 내가 선택한 답';
+                li.appendChild(badge);
+            }
+        }
+
+        optionsContainer.appendChild(li);
+    });
+
+    // Buttons Visibility
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnReveal = document.getElementById('btn-reveal');
+    const btnExplain = document.getElementById('btn-explain');
+    const feedbackMsg = document.getElementById('feedback-message');
+    const explanationBox = document.getElementById('explanation-box');
+
+    if (appState.mode === 'exam') {
+        btnReveal.style.display = 'none';
+        btnExplain.style.display = 'none';
+        explanationBox.classList.remove('active');
+        if (userAns) {
+            btnSubmit.disabled = true;
+            feedbackMsg.style.display = 'block';
+            feedbackMsg.innerText = '답안이 제출되었습니다.';
+            feedbackMsg.style.color = 'var(--text-muted)';
+        } else {
+            btnSubmit.disabled = false;
+            feedbackMsg.style.display = 'none';
+        }
+    } else {
+        // Study Mode
+        btnReveal.style.display = 'inline-flex';
+        btnExplain.style.display = 'inline-flex';
+
+        if (userAns) {
+            btnSubmit.disabled = true;
+            feedbackMsg.style.display = 'block';
+            if (userAns.status === 'correct') {
+                feedbackMsg.innerText = '🎉 정답입니다!';
+                feedbackMsg.style.color = 'var(--success)';
+            } else if (userAns.status === 'incorrect') {
+                feedbackMsg.innerText = '❌ 오답입니다.';
+                feedbackMsg.style.color = 'var(--danger)';
+            } else {
+                feedbackMsg.innerText = '🟡 정답을 확인한 문제입니다.';
+                feedbackMsg.style.color = 'var(--warning)';
+            }
+        } else {
+            btnSubmit.disabled = false;
+            feedbackMsg.style.display = 'none';
+            explanationBox.classList.remove('active');
+        }
+    }
+
+    // Previous / Next Buttons
+    document.getElementById('btn-prev').disabled = (appState.currentIndex === 0);
+    
+    const btnNext = document.getElementById('btn-next');
+    if (appState.currentIndex === questionsData.length - 1) {
+        btnNext.innerText = '최종 제출 및 결과 보기';
+    } else {
+        btnNext.innerText = '다음 문제 →';
+    }
+
+    // Fill Explanation Data
+    document.getElementById('exp-answer').innerText = `${q.answer + 1}번: ${q.options[q.answer]}`;
+    document.getElementById('exp-concept').innerText = q.concept;
+    document.getElementById('exp-solution').innerText = q.solution;
+    document.getElementById('exp-why').innerText = q.why;
+    document.getElementById('exp-point').innerText = q.examPoint;
+    
+    const wrongContainer = document.getElementById('exp-wrong-container');
+    if (q.wrongPoints) {
+        wrongContainer.style.display = 'block';
+        document.getElementById('exp-wrong').innerText = q.wrongPoints;
+    } else {
+        wrongContainer.style.display = 'none';
+    }
+}
+
+function submitAnswer() {
+    const selectedOpt = document.querySelector('input[name="quiz-option"]:checked');
+    if (!selectedOpt) {
+        alert('답을 선택해주세요!');
+        return;
+    }
+
+    const selectedIndex = parseInt(selectedOpt.value);
+    const q = questionsData[appState.currentIndex];
+    const isCorrect = (selectedIndex === q.answer);
+
+    appState.userAnswers[appState.currentIndex] = {
+        selected: selectedIndex,
+        status: isCorrect ? 'correct' : 'incorrect'
+    };
+
+    if (appState.mode === 'study') {
+        document.getElementById('explanation-box').classList.add('active');
+    }
+
+    renderQuiz();
+}
+
+function revealAnswer() {
+    const q = questionsData[appState.currentIndex];
+    if (!appState.userAnswers[appState.currentIndex]) {
+        appState.userAnswers[appState.currentIndex] = {
+            selected: null,
+            status: 'revealed'
+        };
+    }
+    document.getElementById('explanation-box').classList.add('active');
+    renderQuiz();
+}
+
+function toggleExplanation() {
+    const box = document.getElementById('explanation-box');
+    box.classList.toggle('active');
+}
+
+function prevQuestion() {
+    if (appState.currentIndex > 0) {
+        appState.currentIndex--;
+        renderQuiz();
+    }
+}
+
+function nextQuestion() {
+    if (appState.currentIndex < questionsData.length - 1) {
+        appState.currentIndex++;
+        renderQuiz();
+    } else {
+        finishQuiz();
+    }
+}
+
+function finishQuiz() {
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let unansweredCount = 0;
+
+    appState.userAnswers.forEach(ans => {
+        if (!ans) {
+            unansweredCount++;
+        } else if (ans.status === 'correct') {
+            correctCount++;
+        } else {
+            incorrectCount++;
+        }
+    });
+
+    const total = questionsData.length;
+    const score = Math.round((correctCount / total) * 100);
+
+    document.getElementById('res-score').innerText = `${score}점`;
+    document.getElementById('res-rate').innerText = `${score}%`;
+    document.getElementById('res-correct').innerText = correctCount;
+    document.getElementById('res-incorrect').innerText = incorrectCount;
+    document.getElementById('res-unanswered').innerText = unansweredCount;
+
+    showScreen('result');
+}
+
+function restartApp(filter) {
+    if (filter === 'all') {
+        startApp(appState.mode);
+    } else if (filter === 'wrong') {
+        // Keep only wrong questions or reset unanswered
+        appState.currentIndex = 0;
+        appState.userAnswers = appState.userAnswers.map(ans => {
+            return (ans && ans.status === 'incorrect') ? null : ans;
+        });
+        showScreen('quiz');
+        renderQuiz();
+    }
+}
+
+function switchToReview() {
+    appState.mode = 'study';
+    appState.currentIndex = 0;
+    showScreen('quiz');
+    renderQuiz();
+}
+</script>
+
+</body>
+</html>
