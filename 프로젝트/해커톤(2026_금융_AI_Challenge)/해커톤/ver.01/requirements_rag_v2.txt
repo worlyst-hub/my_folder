@@ -1,0 +1,6 @@
+# ChromaDB: 임베딩 벡터와 검색 metadata를 로컬에 저장합니다.
+chromadb
+
+# Sentence Transformers: multilingual-e5-base 임베딩 모델을 로컬에서 실행합니다.
+# PyTorch와 Transformers 등 필요한 하위 패키지는 함께 설치됩니다.
+sentence-transformers
