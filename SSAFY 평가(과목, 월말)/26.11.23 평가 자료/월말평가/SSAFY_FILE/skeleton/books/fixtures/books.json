@@ -1,0 +1,62 @@
+[
+{
+    "model": "books.book",
+    "pk": 1,
+    "fields": {
+        "title": "아몬드",
+        "author": "손원평",
+        "content": "감정을 느끼지 못하는 소년 윤재의 성장 이야기. 타인의 감정을 이해하려 애쓰는 과정이 인상 깊었다.",
+        "finished": true,
+        "created_at": "2026-11-11T01:32:35.387Z",
+        "updated_at": "2026-11-11T01:32:35.387Z"
+    }
+},
+{
+    "model": "books.book",
+    "pk": 2,
+    "fields": {
+        "title": "클린 코드",
+        "author": "로버트 C. 마틴",
+        "content": "읽기 좋은 코드를 작성하는 원칙. 함수는 한 가지 일만 해야 한다는 부분을 다시 새기게 되었다.",
+        "finished": false,
+        "created_at": "2026-11-11T01:32:35.428Z",
+        "updated_at": "2026-11-11T01:32:35.428Z"
+    }
+},
+{
+    "model": "books.book",
+    "pk": 3,
+    "fields": {
+        "title": "사피엔스",
+        "author": "유발 하라리",
+        "content": "인류의 역사를 인지혁명, 농업혁명, 과학혁명으로 나누어 설명한다. 허구를 믿는 능력에 대한 부분이 흥미롭다.",
+        "finished": true,
+        "created_at": "2026-11-11T01:32:35.430Z",
+        "updated_at": "2026-11-11T01:32:35.430Z"
+    }
+},
+{
+    "model": "books.book",
+    "pk": 4,
+    "fields": {
+        "title": "데미안",
+        "author": "헤르만 헤세",
+        "content": "새는 알에서 나오려고 투쟁한다. 자기 자신을 찾아가는 싱클레어의 여정.",
+        "finished": false,
+        "created_at": "2026-11-11T01:32:35.431Z",
+        "updated_at": "2026-11-11T01:32:35.431Z"
+    }
+},
+{
+    "model": "books.book",
+    "pk": 5,
+    "fields": {
+        "title": "코스모스",
+        "author": "칼 세이건",
+        "content": "우주와 과학에 대한 이야기를 쉽게 풀어낸 책. 아직 절반 정도 읽었다.",
+        "finished": false,
+        "created_at": "2026-11-11T01:32:35.432Z",
+        "updated_at": "2026-11-11T01:32:35.432Z"
+    }
+}
+]
